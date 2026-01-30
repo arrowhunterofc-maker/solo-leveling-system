@@ -6,7 +6,7 @@ let corrida = 0;
 
 // ===== FUNÇÕES DE TREINO =====
 function treinarFlexao() {
-  if (flexao < 100) {
+  if (flexao < 100 && !tempoAcabou) {
     flexao++;
     document.getElementById("flexao").innerText = flexao;
     if (flexao === 100) {
@@ -16,7 +16,7 @@ function treinarFlexao() {
 }
 
 function treinarAbdominal() {
-  if (abdominal < 100) {
+  if (abdominal < 100 && !tempoAcabou) {
     abdominal++;
     document.getElementById("abdominal").innerText = abdominal;
     if (abdominal === 100) {
@@ -26,7 +26,7 @@ function treinarAbdominal() {
 }
 
 function treinarAgachamento() {
-  if (agachamento < 100) {
+  if (agachamento < 100 && !tempoAcabou) {
     agachamento++;
     document.getElementById("agachamento").innerText = agachamento;
     if (agachamento === 100) {
@@ -36,7 +36,7 @@ function treinarAgachamento() {
 }
 
 function treinarCorrida() {
-  if (corrida < 5) {
+  if (corrida < 5 && !tempoAcabou) {
     corrida++;
     document.getElementById("corrida").innerText = corrida;
     if (corrida === 5) {
@@ -45,11 +45,12 @@ function treinarCorrida() {
   }
 }
 
-// ===== TIMER DE 35 MINUTOS =====
+// ===== TIMER DE 50 MINUTOS =====
 let timerInterval;
-let tempoMinutos = 35;
+let tempoMinutos = 50;
 let tempoSegundos = 0;
 let timerAtivo = false;
+let tempoAcabou = false;
 
 document.getElementById("startBtn").addEventListener("click", function() {
   if (!timerAtivo) {
@@ -62,7 +63,8 @@ function contarTempo() {
   if (tempoSegundos === 0) {
     if (tempoMinutos === 0) {
       clearInterval(timerInterval);
-      alert("⏰ Tempo esgotado!");
+      tempoAcabou = true;
+      alert("⏰ Tempo esgotado! Penalidade aplicada: NÃO USAR INTERNET POR 1 DIA");
       return;
     } else {
       tempoMinutos--;
