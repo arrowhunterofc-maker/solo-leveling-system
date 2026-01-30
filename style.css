@@ -28,24 +28,66 @@ ul {
 }
 
 li {
-  margin: 10px 0;
+  margin: 12px 0;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
 }
 
+/* ===== TEXTO DAS MISSÕES ===== */
+li span {
+  margin-left: 5px;
+}
+
+/* ===== BOTÕES (GERAL) ===== */
+button {
+  background: transparent;
+  border: 1px solid #4fc3ff;
+  color: #cce6ff;
+  cursor: pointer;
+  font-family: 'Orbitron', sans-serif;
+}
+
+button:hover {
+  background: rgba(79,195,255,0.15);
+}
+
+/* ===== BOTÕES +1 ===== */
+li button {
+  margin-left: 10px;
+  padding: 4px 10px;
+  font-size: 12px;
+  width: auto;
+}
+
+/* ===== BOTÃO ATIVAR SISTEMA ===== */
+#installBtn {
+  margin-top: 20px;
+  width: 100%;
+  padding: 12px;
+  font-size: 16px;
+}
+
+/* ===== TIMER ===== */
 .timer {
   margin-top: 20px;
   text-align: center;
 }
 
-button {
-  margin-top: 15px;
-  width: 100%;
-  padding: 10px;
-  background: transparent;
-  border: 1px solid #4fc3ff;
-  color: #cce6ff;
-  cursor: pointer;
+/* ===== CHECK VERDE (MISSÃO CONCLUÍDA) ===== */
+span[id^="ok-"] {
+  color: #00ff88;
+  font-weight: bold;
+  margin-left: 6px;
+  animation: glow 0.8s infinite alternate;
 }
 
-button:hover {
-  background: rgba(79,195,255,0.1);
+/* ===== ANIMAÇÃO SOLO LEVELING ===== */
+@keyframes glow {
+  0% {
+    text-shadow: 0 0 5px #00ff88;
+  }
+  100% {
+    text-shadow: 0 0 15px #00ff88;
+  }
 }
