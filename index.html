@@ -5,8 +5,8 @@
   <title>Sistema</title>
   <link rel="stylesheet" href="style.css">
 
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#0a1428">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0a1428">
 </head>
 <body>
 
@@ -14,19 +14,42 @@
   <h1>[ MISSÕES DIÁRIAS ]</h1>
 
   <ul>
-    <li>Flexões: <span id="flexao">0</span> / 100</li>
-    <li>Abdominais: <span id="abdominal">0</span> / 100</li>
-    <li>Agachamentos: <span id="agachamento">0</span> / 100</li>
-    <li>Corrida: <span id="corrida">0</span> / 5 km</li>
+    <li>
+      Flexões:
+      <span id="flexao">0</span> / 100
+      <button onclick="treinarFlexao()">+1</button>
+      <span id="ok-flexao"></span>
+    </li>
+
+    <li>
+      Abdominais:
+      <span id="abdominal">0</span> / 100
+      <button onclick="treinarAbdominal()">+1</button>
+      <span id="ok-abdominal"></span>
+    </li>
+
+    <li>
+      Agachamentos:
+      <span id="agachamento">0</span> / 100
+      <button onclick="treinarAgachamento()">+1</button>
+      <span id="ok-agachamento"></span>
+    </li>
+
+    <li>
+      Corrida:
+      <span id="corrida">0</span> / 5 km
+      <button onclick="treinarCorrida()">+1</button>
+      <span id="ok-corrida"></span>
+    </li>
   </ul>
 
-  <p class="timer">Tempo restante: <span id="tempo">05:00</span></p>
+  <p class="timer">
+    Tempo restante: <span id="tempo">05:00</span>
+  </p>
 
-  <button onclick="treinar()">Treinar</button>
-
-<button id="installBtn" style="display:none;">
-  [ ATIVAR SISTEMA ]
-</button>
+  <button id="installBtn" style="display:none;">
+    [ ATIVAR SISTEMA ]
+  </button>
 
 </div>
 
