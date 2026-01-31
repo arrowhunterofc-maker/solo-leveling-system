@@ -112,11 +112,14 @@ function subirRank() {
 
 // ===== BARRA DE PROGRESSO =====
 function atualizarBarraRank() {
+  const rankBar = document.getElementById("rankProgress");
   if (rankIndex < ranks.length - 1) {
     let progresso = ((nivel % 10) / 10) * 100;
-    document.getElementById("rankProgress").style.width = progresso + "%";
+    rankBar.style.width = progresso + "%";
+    rankBar.style.background = "linear-gradient(90deg, #4fc3ff, #00ffff)";
   } else {
-    document.getElementById("rankProgress").style.width = "100%";
+    rankBar.style.width = "100%";
+    rankBar.style.background = "linear-gradient(90deg, #ffcc00, #ffd700)";
   }
 }
 
