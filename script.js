@@ -76,6 +76,9 @@ function subirNivel() {
   document.getElementById("ok-agachamento").innerText = "";
   document.getElementById("ok-corrida").innerText = "";
 
+  // Atualiza barra de progresso
+  atualizarBarraRank();
+
   // Subir rank se não é máximo
   if (nivel % 10 === 0 && rankIndex < ranks.length - 1) {
     subirRank();
@@ -101,6 +104,19 @@ function subirRank() {
     const msg = document.getElementById("maxRankMessage");
     msg.style.display = "block";
     setTimeout(() => { msg.style.display = "none"; }, 5000);
+  }
+
+  // Atualiza barra de progresso
+  atualizarBarraRank();
+}
+
+// ===== BARRA DE PROGRESSO =====
+function atualizarBarraRank() {
+  if (rankIndex < ranks.length - 1) {
+    let progresso = ((nivel % 10) / 10) * 100;
+    document.getElementById("rankProgress").style.width = progresso + "%";
+  } else {
+    document.getElementById("rankProgress").style.width = "100%";
   }
 }
 
@@ -136,4 +152,9 @@ function contarTempo() {
   let minStr = tempoMinutos < 10 ? "0" + tempoMinutos : tempoMinutos;
   let segStr = tempoSegundos < 10 ? "0" + tempoSegundos : tempoSegundos;
   document.getElementById("tempo").innerText = minStr + ":" + segStr;
+}
+
+// ===== Inicializa barra ao carregar =====
+window.onload = function() {
+  atualizarBarraRank();
 }
