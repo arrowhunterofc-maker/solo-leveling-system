@@ -10,38 +10,45 @@
   <!-- SEO Básico -->
   <meta name="description" content="Solo Leveling Simulator - complete suas missões diárias com flexões, abdominais, agachamentos e corrida.">
   <meta name="keywords" content="Solo Leveling, treino, flexões, abdominais, agachamentos, corrida, missões diárias, anime, simulator">
-  <meta name="author" content="arrowhunterofc">
+  <meta name="author" content="Seu Nome">
+
+  <!-- Verificação Google -->
+  <meta name="google-site-verification" content="google4601035eed900403" />
 </head>
 <body>
 
 <div class="system-panel">
   <h1>[ MISSÕES DIÁRIAS ]</h1>
 
+  <!-- Nível do jogador -->
+  <p class="nivel">Nível: <span id="nivel">1</span></p>
+
+  <!-- Mensagem de subir de nível -->
+  <div id="levelUpMessage" class="level-up">
+    Subiu de Nível! <span id="oldLevel">0</span> → <span id="newLevel">1</span>
+  </div>
+
   <ul>
     <li>
-      Flexões:
-      <span id="flexao">0</span> / 100
+      Flexões: <span id="flexao">0</span> / 100
       <button onclick="treinarFlexao()">+1</button>
       <span id="ok-flexao"></span>
     </li>
 
     <li>
-      Abdominais:
-      <span id="abdominal">0</span> / 100
+      Abdominais: <span id="abdominal">0</span> / 100
       <button onclick="treinarAbdominal()">+1</button>
       <span id="ok-abdominal"></span>
     </li>
 
     <li>
-      Agachamentos:
-      <span id="agachamento">0</span> / 100
+      Agachamentos: <span id="agachamento">0</span> / 100
       <button onclick="treinarAgachamento()">+1</button>
       <span id="ok-agachamento"></span>
     </li>
 
     <li>
-      Corrida:
-      <span id="corrida">0</span> / 5 km
+      Corrida: <span id="corrida">0</span> / 5 km
       <button onclick="treinarCorrida()">+1</button>
       <span id="ok-corrida"></span>
     </li>
