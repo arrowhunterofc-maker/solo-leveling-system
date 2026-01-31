@@ -1,3 +1,4 @@
+/* ===== BODY ===== */
 body {
   background: radial-gradient(#020b1f, #000);
   font-family: 'Orbitron', sans-serif;
@@ -6,14 +7,18 @@ body {
   align-items: center;
   height: 100vh;
   color: #cce6ff;
+  position: relative; /* necessário para a animação de nível */
 }
 
+/* ===== PAINEL ===== */
 .system-panel {
   background: rgba(10, 20, 40, 0.9);
   border: 1px solid #4fc3ff;
   padding: 25px;
   width: 360px;
   box-shadow: 0 0 20px #4fc3ff;
+  border-radius: 15px;
+  position: relative;
 }
 
 h1 {
@@ -22,72 +27,81 @@ h1 {
   color: #7fd7ff;
 }
 
+/* ===== LISTA ===== */
 ul {
   list-style: none;
   padding: 0;
 }
 
 li {
-  margin: 12px 0;
+  margin: 10px 0;
   display: flex;
   align-items: center;
-  flex-wrap: wrap;
+  justify-content: space-between;
 }
 
-/* ===== TEXTO DAS MISSÕES ===== */
-li span {
-  margin-left: 5px;
-}
-
-/* ===== BOTÕES (GERAL) ===== */
-button {
-  background: transparent;
-  border: 1px solid #4fc3ff;
-  color: #cce6ff;
-  cursor: pointer;
-  font-family: 'Orbitron', sans-serif;
-}
-
-button:hover {
-  background: rgba(79,195,255,0.15);
-}
-
-/* ===== BOTÕES +1 ===== */
 li button {
   margin-left: 10px;
-  padding: 4px 10px;
-  font-size: 12px;
   width: auto;
-}
-
-/* ===== BOTÃO ATIVAR SISTEMA ===== */
-#installBtn {
-  margin-top: 20px;
-  width: 100%;
-  padding: 12px;
-  font-size: 16px;
+  padding: 5px 10px;
+  font-size: 14px;
 }
 
 /* ===== TIMER ===== */
 .timer {
   margin-top: 20px;
   text-align: center;
+  font-size: 18px;
 }
 
-/* ===== CHECK VERDE (MISSÃO CONCLUÍDA) ===== */
-span[id^="ok-"] {
-  color: #00ff88;
+/* ===== BOTÕES PRINCIPAIS ===== */
+button {
+  margin-top: 15px;
+  width: 100%;
+  padding: 10px;
+  background: transparent;
+  border: 1px solid #4fc3ff;
+  color: #cce6ff;
+  cursor: pointer;
+  border-radius: 10px;
+}
+
+button:hover {
+  background: rgba(79,195,255,0.1);
+}
+
+/* ===== NÍVEL ===== */
+.nivel {
+  text-align: center;
+  font-size: 20px;
+  margin-bottom: 15px;
   font-weight: bold;
-  margin-left: 6px;
-  animation: glow 0.8s infinite alternate;
+  color: #7fd7ff;
 }
 
-/* ===== ANIMAÇÃO SOLO LEVELING ===== */
-@keyframes glow {
-  0% {
-    text-shadow: 0 0 5px #00ff88;
-  }
-  100% {
-    text-shadow: 0 0 15px #00ff88;
-  }
+/* ===== MENSAGEM SUBIU DE NÍVEL ===== */
+.level-up {
+  display: none; /* inicialmente escondido */
+  position: absolute;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(79,195,255,0.9);
+  color: #fff;
+  padding: 20px 40px;
+  font-size: 24px;
+  font-weight: bold;
+  border-radius: 15px;
+  box-shadow: 0 0 20px #4fc3ff;
+  animation: fadeUp 2s ease forwards;
+  text-align: center;
+  z-index: 999;
+}
+
+/* ===== ANIMAÇÃO FADE UP ===== */
+@keyframes fadeUp {
+  0% {opacity: 0; transform: translate(-50%, 0%);}
+  10% {opacity: 1; transform: translate(-50%, -20%);}
+  90% {opacity: 1; transform: translate(-50%, -50%);}
+  100% {opacity: 0; transform: translate(-50%, -80%);}
 }
