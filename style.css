@@ -1,4 +1,3 @@
-/* ===== BODY ===== */
 body {
   background: radial-gradient(#020b1f, #000);
   font-family: 'Orbitron', sans-serif;
@@ -7,18 +6,14 @@ body {
   align-items: center;
   height: 100vh;
   color: #cce6ff;
-  position: relative; /* necessário para a animação de nível */
 }
 
-/* ===== PAINEL ===== */
 .system-panel {
   background: rgba(10, 20, 40, 0.9);
   border: 1px solid #4fc3ff;
   padding: 25px;
-  width: 360px;
+  width: 400px;
   box-shadow: 0 0 20px #4fc3ff;
-  border-radius: 15px;
-  position: relative;
 }
 
 h1 {
@@ -27,7 +22,6 @@ h1 {
   color: #7fd7ff;
 }
 
-/* ===== LISTA ===== */
 ul {
   list-style: none;
   padding: 0;
@@ -35,73 +29,54 @@ ul {
 
 li {
   margin: 10px 0;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
 }
 
-li button {
-  margin-left: 10px;
-  width: auto;
-  padding: 5px 10px;
-  font-size: 14px;
-}
-
-/* ===== TIMER ===== */
 .timer {
   margin-top: 20px;
   text-align: center;
-  font-size: 18px;
 }
 
-/* ===== BOTÕES PRINCIPAIS ===== */
 button {
-  margin-top: 15px;
-  width: 100%;
-  padding: 10px;
+  margin-left: 10px;
+  padding: 5px 10px;
   background: transparent;
   border: 1px solid #4fc3ff;
   color: #cce6ff;
   cursor: pointer;
-  border-radius: 10px;
 }
 
 button:hover {
   background: rgba(79,195,255,0.1);
 }
 
-/* ===== NÍVEL ===== */
-.nivel {
-  text-align: center;
-  font-size: 20px;
-  margin-bottom: 15px;
-  font-weight: bold;
-  color: #7fd7ff;
-}
-
-/* ===== MENSAGEM SUBIU DE NÍVEL ===== */
+/* Level Up e Rank Up com pulse */
 .level-up {
-  display: none; /* inicialmente escondido */
-  position: absolute;
-  top: 40%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: rgba(79,195,255,0.9);
-  color: #fff;
-  padding: 20px 40px;
-  font-size: 24px;
-  font-weight: bold;
-  border-radius: 15px;
-  box-shadow: 0 0 20px #4fc3ff;
-  animation: fadeUp 2s ease forwards;
+  display: none;
+  margin-top: 20px;
   text-align: center;
-  z-index: 999;
+  font-size: 22px;
+  font-weight: bold;
+  color: #4fc3ff;
+  animation: fadeInOut 2.5s ease-in-out, pulse 0.7s infinite alternate;
 }
 
-/* ===== ANIMAÇÃO FADE UP ===== */
-@keyframes fadeUp {
-  0% {opacity: 0; transform: translate(-50%, 0%);}
-  10% {opacity: 1; transform: translate(-50%, -20%);}
-  90% {opacity: 1; transform: translate(-50%, -50%);}
-  100% {opacity: 0; transform: translate(-50%, -80%);}
+/* Mensagem especial */
+.special {
+  color: #ffcc00;
+  font-size: 18px;
+  animation: fadeInOut 5s ease-in-out, pulse 0.8s infinite alternate;
+}
+
+/* Fade in/out */
+@keyframes fadeInOut {
+  0% {opacity: 0;}
+  10% {opacity: 1;}
+  90% {opacity: 1;}
+  100% {opacity: 0;}
+}
+
+/* Pulse efeito */
+@keyframes pulse {
+  from {text-shadow: 0 0 5px #4fc3ff;}
+  to {text-shadow: 0 0 20px #00ffff;}
 }
