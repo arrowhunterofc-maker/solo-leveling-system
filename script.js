@@ -1,163 +1,134 @@
-// ===== CONTADORES =====
-let flexao = 0;
-let abdominal = 0;
-let agachamento = 0;
-let corrida = 0;
-let nivel = 1;
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Solo Leveling Simulator</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0a1428">
+</head>
+<body>
 
-const ranks = ["F+", "E", "D", "C", "B", "A", "S", "S+", "S++", "S+++"];
-let rankIndex = 0;
+<!-- ===== TELA INICIAL - NOME DO JOGADOR ===== -->
+<div id="loginScreen" class="login-screen">
+  <div class="login-box">
+    <h2>Insira o seu nome de jogador:</h2>
+    <input type="text" id="playerNameInput" placeholder="Seu nome...">
+    <button onclick="iniciarJogo()">Iniciar</button>
+  </div>
+</div>
 
-// ===== TREINO =====
-function treinarFlexao() {
-  if (flexao < 100 && !tempoAcabou) {
-    flexao++;
-    document.getElementById("flexao").innerText = flexao;
-    if (flexao === 100) document.getElementById("ok-flexao").innerText = " ✔️";
-    verificarMissaoCompleta();
+<!-- ===== SISTEMA PRINCIPAL ===== -->
+<div id="gameScreen" class="system-panel">
+  <h1>[ MISSÕES DIÁRIAS ]</h1>
+
+  <!-- LOGIN GOOGLE (mantido) -->
+  <button onclick="loginGoogle()">Entrar com Google</button>
+  <p id="userInfo"></p>
+  <button onclick="logout()">Sair</button>
+
+  <ul>
+    <li>
+      Flexões:
+      <span id="flexao">0</span> / 100
+      <span id="ok-flexao"></span>
+      <button onclick="treinarFlexao()">+1</button>
+    </li>
+    <li>
+      Abdominais:
+      <span id="abdominal">0</span> / 100
+      <span id="ok-abdominal"></span>
+      <button onclick="treinarAbdominal()">+1</button>
+    </li>
+    <li>
+      Agachamentos:
+      <span id="agachamento">0</span> / 100
+      <span id="ok-agachamento"></span>
+      <button onclick="treinarAgachamento()">+1</button>
+    </li>
+    <li>
+      Corrida:
+      <span id="corrida">0</span> / 5 km
+      <span id="ok-corrida"></span>
+      <button onclick="treinarCorrida()">+1</button>
+    </li>
+  </ul>
+
+  <p class="timer">
+    Tempo restante: <span id="tempo">50:00</span>
+  </p>
+  <button id="startBtn">Iniciar Timer</button>
+
+  <p>Nível: <span id="nivel">1</span></p>
+  <p>Rank: <span id="rank">F+</span></p>
+
+  <div class="rank-bar">
+    <div id="rankProgress"></div>
+  </div>
+
+  <!-- Mensagem de Nível -->
+  <div id="levelUpMessage" class="level-up">
+    Subiu de Nível! <span id="oldLevel"></span> → <span id="newLevel"></span>
+  </div>
+
+  <!-- Mensagem de Rank -->
+  <div id="rankUpMessage" class="level-up">
+    Subiu de Rank! <span id="oldRank"></span> → <span id="newRank"></span>
+  </div>
+
+  <!-- Mensagem especial S+++ -->
+  <div id="maxRankMessage" class="level-up special">
+    Olá caçador, Eu sou o sistema, e eu quero dizer que você atingiu o nível
+    MÁXIMO de poder já visto na história. PARABÉNS!
+  </div>
+</div>
+
+<!-- ===== FIREBASE ===== -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyCQpG5b-qbB-k0QtFaRQNnW1o68Pwy2Hqc",
+    authDomain: "solo-leveling-system-95e2d.firebaseapp.com",
+    projectId: "solo-leveling-system-95e2d",
+    storageBucket: "solo-leveling-system-95e2d.firebasestorage.app",
+    messagingSenderId: "174563314205",
+    appId: "1:174563314205:web:0284b7a79571ef099594f4",
+    measurementId: "G-VX898GYVXP"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const provider = new firebase.auth.GoogleAuthProvider();
+
+  function loginGoogle() {
+    auth.signInWithPopup(provider)
+      .then((result) => {
+        const user = result.user;
+        document.getElementById("userInfo").innerText =
+          `👤 ${user.displayName} (${user.email})`;
+      })
+      .catch((error) => {
+        alert("Erro no login: " + error.message);
+      });
   }
-}
 
-function treinarAbdominal() {
-  if (abdominal < 100 && !tempoAcabou) {
-    abdominal++;
-    document.getElementById("abdominal").innerText = abdominal;
-    if (abdominal === 100) document.getElementById("ok-abdominal").innerText = " ✔️";
-    verificarMissaoCompleta();
-  }
-}
-
-function treinarAgachamento() {
-  if (agachamento < 100 && !tempoAcabou) {
-    agachamento++;
-    document.getElementById("agachamento").innerText = agachamento;
-    if (agachamento === 100) document.getElementById("ok-agachamento").innerText = " ✔️";
-    verificarMissaoCompleta();
-  }
-}
-
-function treinarCorrida() {
-  if (corrida < 5 && !tempoAcabou) {
-    corrida++;
-    document.getElementById("corrida").innerText = corrida;
-    if (corrida === 5) document.getElementById("ok-corrida").innerText = " ✔️";
-    verificarMissaoCompleta();
-  }
-}
-
-// ===== VERIFICA MISSÃO =====
-function verificarMissaoCompleta() {
-  if (flexao === 100 && abdominal === 100 && agachamento === 100 && corrida === 5) {
-    subirNivel();
-  }
-}
-
-// ===== SUBIR NÍVEL =====
-function subirNivel() {
-  const oldLevel = nivel;
-  nivel++;
-  document.getElementById("nivel").innerText = nivel;
-
-  // Mensagem nível
-  const levelMsg = document.getElementById("levelUpMessage");
-  document.getElementById("oldLevel").innerText = oldLevel;
-  document.getElementById("newLevel").innerText = nivel;
-  levelMsg.style.display = "block";
-  setTimeout(() => { levelMsg.style.display = "none"; }, 2500);
-
-  // Resetar missões
-  flexao = 0; abdominal = 0; agachamento = 0; corrida = 0;
-  document.getElementById("flexao").innerText = flexao;
-  document.getElementById("abdominal").innerText = abdominal;
-  document.getElementById("agachamento").innerText = agachamento;
-  document.getElementById("corrida").innerText = corrida;
-  document.getElementById("ok-flexao").innerText = "";
-  document.getElementById("ok-abdominal").innerText = "";
-  document.getElementById("ok-agachamento").innerText = "";
-  document.getElementById("ok-corrida").innerText = "";
-
-  // Atualiza barra de progresso
-  atualizarBarraRank();
-
-  // Subir rank se não é máximo
-  if (nivel % 10 === 0 && rankIndex < ranks.length - 1) {
-    subirRank();
-  }
-}
-
-// ===== SUBIR RANK =====
-function subirRank() {
-  const oldRank = ranks[rankIndex];
-  rankIndex++;
-  const newRank = ranks[rankIndex];
-  document.getElementById("rank").innerText = newRank;
-
-  // Mensagem rank
-  const rankMsg = document.getElementById("rankUpMessage");
-  document.getElementById("oldRank").innerText = oldRank;
-  document.getElementById("newRank").innerText = newRank;
-  rankMsg.style.display = "block";
-  setTimeout(() => { rankMsg.style.display = "none"; }, 2500);
-
-  // Mensagem especial S+++
-  if (newRank === "S+++") {
-    const msg = document.getElementById("maxRankMessage");
-    msg.style.display = "block";
-    setTimeout(() => { msg.style.display = "none"; }, 5000);
+  function logout() {
+    auth.signOut().then(() => {
+      document.getElementById("userInfo").innerText = "";
+    });
   }
 
-  // Atualiza barra de progresso
-  atualizarBarraRank();
-}
-
-// ===== BARRA DE PROGRESSO =====
-function atualizarBarraRank() {
-  const rankBar = document.getElementById("rankProgress");
-  if (rankIndex < ranks.length - 1) {
-    let progresso = ((nivel % 10) / 10) * 100;
-    rankBar.style.width = progresso + "%";
-    rankBar.style.background = "linear-gradient(90deg, #4fc3ff, #00ffff)";
-  } else {
-    rankBar.style.width = "100%";
-    rankBar.style.background = "linear-gradient(90deg, #ffcc00, #ffd700)";
-  }
-}
-
-// ===== TIMER 50 MIN =====
-let timerInterval;
-let tempoMinutos = 50;
-let tempoSegundos = 0;
-let timerAtivo = false;
-let tempoAcabou = false;
-
-document.getElementById("startBtn").addEventListener("click", function() {
-  if (!timerAtivo) {
-    timerAtivo = true;
-    timerInterval = setInterval(contarTempo, 1000);
-  }
-});
-
-function contarTempo() {
-  if (tempoSegundos === 0) {
-    if (tempoMinutos === 0) {
-      clearInterval(timerInterval);
-      tempoAcabou = true;
-      alert("⏰ Tempo esgotado! Penalidade aplicada: NÃO USAR INTERNET POR 1 DIA");
-      return;
-    } else {
-      tempoMinutos--;
-      tempoSegundos = 59;
+  auth.onAuthStateChanged((user) => {
+    if (user) {
+      document.getElementById("userInfo").innerText =
+        `👤 ${user.displayName} (${user.email})`;
     }
-  } else {
-    tempoSegundos--;
-  }
+  });
+</script>
 
-  let minStr = tempoMinutos < 10 ? "0" + tempoMinutos : tempoMinutos;
-  let segStr = tempoSegundos < 10 ? "0" + tempoSegundos : tempoSegundos;
-  document.getElementById("tempo").innerText = minStr + ":" + segStr;
-}
+<!-- ===== SCRIPT PRINCIPAL ===== -->
+<script src="script.js"></script>
 
-// ===== Inicializa barra ao carregar =====
-window.onload = function() {
-  atualizarBarraRank();
-}
+</body>
+</html>
