@@ -12,6 +12,11 @@
 <div class="system-panel">
   <h1>[ MISSÕES DIÁRIAS ]</h1>
 
+  <!-- LOGIN GOOGLE -->
+  <button onclick="loginGoogle()">Entrar com Google</button>
+  <p id="userInfo"></p>
+  <button onclick="logout()">Sair</button>
+
   <ul>
     <li>Flexões: <span id="flexao">0</span> / 100 <span id="ok-flexao"></span> <button onclick="treinarFlexao()">+1</button></li>
     <li>Abdominais: <span id="abdominal">0</span> / 100 <span id="ok-abdominal"></span> <button onclick="treinarAbdominal()">+1</button></li>
@@ -44,6 +49,55 @@
   </div>
 </div>
 
+<!-- ===== FIREBASE ===== -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+<script>
+  // CONFIGURAÇÃO FIREBASE (usando seus dados)
+  const firebaseConfig = {
+    apiKey: "AIzaSyCQpG5b-qbB-k0QtFaRQNnW1o68Pwy2Hqc",
+    authDomain: "solo-leveling-system-95e2d.firebaseapp.com",
+    projectId: "solo-leveling-system-95e2d",
+    storageBucket: "solo-leveling-system-95e2d.firebasestorage.app",
+    messagingSenderId: "174563314205",
+    appId: "1:174563314205:web:0284b7a79571ef099594f4",
+    measurementId: "G-VX898GYVXP"
+  };
+
+  // Inicializa Firebase
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const provider = new firebase.auth.GoogleAuthProvider();
+
+  // Funções de login/logout
+  function loginGoogle() {
+    auth.signInWithPopup(provider)
+      .then((result) => {
+        const user = result.user;
+        document.getElementById("userInfo").innerText =
+          `👤 ${user.displayName} (${user.email})`;
+      })
+      .catch((error) => {
+        alert("Erro no login: " + error.message);
+      });
+  }
+
+  function logout() {
+    auth.signOut().then(() => {
+      document.getElementById("userInfo").innerText = "";
+    });
+  }
+
+  auth.onAuthStateChanged((user) => {
+    if (user) {
+      document.getElementById("userInfo").innerText =
+        `👤 ${user.displayName} (${user.email})`;
+    }
+  });
+</script>
+
+<!-- ===== SEU SCRIPT ===== -->
 <script src="script.js"></script>
+
 </body>
 </html>
