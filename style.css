@@ -80,3 +80,21 @@ button:hover {
   from {text-shadow: 0 0 5px #4fc3ff;}
   to {text-shadow: 0 0 20px #00ffff;}
 }
+
+/* Barra de progresso de Rank */
+.rank-bar {
+  width: 100%;
+  height: 20px;
+  background: rgba(79,195,255,0.2);
+  border: 1px solid #4fc3ff;
+  border-radius: 10px;
+  margin-bottom: 15px;
+  overflow: hidden;
+}
+
+#rankProgress {
+  width: 0%;
+  height: 100%;
+  background: #4fc3ff;
+  transition: width 0.5s ease-in-out;
+}
