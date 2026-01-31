@@ -1,134 +1,219 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-  <meta charset="UTF-8">
-  <title>Solo Leveling Simulator</title>
-  <link rel="stylesheet" href="style.css">
-  <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#0a1428">
-</head>
-<body>
+// ===============================
+// DADOS DO JOGADOR
+// ===============================
+let nivel = 1;
+let rankIndex = 0;
+let tempo = 50 * 60;
+let timerInterval = null;
 
-<!-- ===== TELA INICIAL - NOME DO JOGADOR ===== -->
-<div id="loginScreen" class="login-screen">
-  <div class="login-box">
-    <h2>Insira o seu nome de jogador:</h2>
-    <input type="text" id="playerNameInput" placeholder="Seu nome...">
-    <button onclick="iniciarJogo()">Iniciar</button>
-  </div>
-</div>
+const ranks = ["F+", "E", "D", "C", "B", "A", "S", "S+", "S++", "S+++"];
 
-<!-- ===== SISTEMA PRINCIPAL ===== -->
-<div id="gameScreen" class="system-panel">
-  <h1>[ MISSÕES DIÁRIAS ]</h1>
+let progresso = {
+  flexao: 0,
+  abdominal: 0,
+  agachamento: 0,
+  corrida: 0
+};
 
-  <!-- LOGIN GOOGLE (mantido) -->
-  <button onclick="loginGoogle()">Entrar com Google</button>
-  <p id="userInfo"></p>
-  <button onclick="logout()">Sair</button>
-
-  <ul>
-    <li>
-      Flexões:
-      <span id="flexao">0</span> / 100
-      <span id="ok-flexao"></span>
-      <button onclick="treinarFlexao()">+1</button>
-    </li>
-    <li>
-      Abdominais:
-      <span id="abdominal">0</span> / 100
-      <span id="ok-abdominal"></span>
-      <button onclick="treinarAbdominal()">+1</button>
-    </li>
-    <li>
-      Agachamentos:
-      <span id="agachamento">0</span> / 100
-      <span id="ok-agachamento"></span>
-      <button onclick="treinarAgachamento()">+1</button>
-    </li>
-    <li>
-      Corrida:
-      <span id="corrida">0</span> / 5 km
-      <span id="ok-corrida"></span>
-      <button onclick="treinarCorrida()">+1</button>
-    </li>
-  </ul>
-
-  <p class="timer">
-    Tempo restante: <span id="tempo">50:00</span>
-  </p>
-  <button id="startBtn">Iniciar Timer</button>
-
-  <p>Nível: <span id="nivel">1</span></p>
-  <p>Rank: <span id="rank">F+</span></p>
-
-  <div class="rank-bar">
-    <div id="rankProgress"></div>
-  </div>
-
-  <!-- Mensagem de Nível -->
-  <div id="levelUpMessage" class="level-up">
-    Subiu de Nível! <span id="oldLevel"></span> → <span id="newLevel"></span>
-  </div>
-
-  <!-- Mensagem de Rank -->
-  <div id="rankUpMessage" class="level-up">
-    Subiu de Rank! <span id="oldRank"></span> → <span id="newRank"></span>
-  </div>
-
-  <!-- Mensagem especial S+++ -->
-  <div id="maxRankMessage" class="level-up special">
-    Olá caçador, Eu sou o sistema, e eu quero dizer que você atingiu o nível
-    MÁXIMO de poder já visto na história. PARABÉNS!
-  </div>
-</div>
-
-<!-- ===== FIREBASE ===== -->
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-<script>
-  const firebaseConfig = {
-    apiKey: "AIzaSyCQpG5b-qbB-k0QtFaRQNnW1o68Pwy2Hqc",
-    authDomain: "solo-leveling-system-95e2d.firebaseapp.com",
-    projectId: "solo-leveling-system-95e2d",
-    storageBucket: "solo-leveling-system-95e2d.firebasestorage.app",
-    messagingSenderId: "174563314205",
-    appId: "1:174563314205:web:0284b7a79571ef099594f4",
-    measurementId: "G-VX898GYVXP"
+// ===============================
+// SALVAR / CARREGAR
+// ===============================
+function salvar() {
+  const dados = {
+    nivel,
+    rankIndex,
+    tempo,
+    progresso
   };
+  localStorage.setItem("solo_save", JSON.stringify(dados));
+}
 
-  firebase.initializeApp(firebaseConfig);
-  const auth = firebase.auth();
-  const provider = new firebase.auth.GoogleAuthProvider();
+function carregar() {
+  const dados = JSON.parse(localStorage.getItem("solo_save"));
+  if (!dados) return;
 
-  function loginGoogle() {
-    auth.signInWithPopup(provider)
-      .then((result) => {
-        const user = result.user;
-        document.getElementById("userInfo").innerText =
-          `👤 ${user.displayName} (${user.email})`;
-      })
-      .catch((error) => {
-        alert("Erro no login: " + error.message);
-      });
+  nivel = dados.nivel;
+  rankIndex = dados.rankIndex;
+  tempo = dados.tempo;
+  progresso = dados.progresso;
+
+  atualizarTela();
+}
+
+// ===============================
+// TELA INICIAL
+// ===============================
+function iniciarJogo() {
+  const nome = document.getElementById("playerNameInput").value.trim();
+
+  if (nome === "") {
+    alert("Digite seu nome!");
+    return;
   }
 
-  function logout() {
-    auth.signOut().then(() => {
-      document.getElementById("userInfo").innerText = "";
-    });
-  }
+  localStorage.setItem("playerName", nome);
 
-  auth.onAuthStateChanged((user) => {
-    if (user) {
-      document.getElementById("userInfo").innerText =
-        `👤 ${user.displayName} (${user.email})`;
+  document.getElementById("loginScreen").style.display = "none";
+  document.getElementById("gameScreen").style.display = "block";
+
+  carregar();
+}
+
+// ===============================
+// AO CARREGAR O SITE
+// ===============================
+window.addEventListener("DOMContentLoaded", () => {
+  const nome = localStorage.getItem("playerName");
+
+  if (nome) {
+    document.getElementById("loginScreen").style.display = "none";
+    document.getElementById("gameScreen").style.display = "block";
+    carregar();
+  } else {
+    document.getElementById("loginScreen").style.display = "flex";
+    document.getElementById("gameScreen").style.display = "none";
+  }
+});
+
+// ===============================
+// MISSÕES
+// ===============================
+function treinarFlexao() {
+  if (progresso.flexao < 100) progresso.flexao++;
+  verificarMissao();
+  atualizarTela();
+}
+
+function treinarAbdominal() {
+  if (progresso.abdominal < 100) progresso.abdominal++;
+  verificarMissao();
+  atualizarTela();
+}
+
+function treinarAgachamento() {
+  if (progresso.agachamento < 100) progresso.agachamento++;
+  verificarMissao();
+  atualizarTela();
+}
+
+function treinarCorrida() {
+  if (progresso.corrida < 5) progresso.corrida++;
+  verificarMissao();
+  atualizarTela();
+}
+
+// ===============================
+// VERIFICA MISSÃO COMPLETA
+// ===============================
+function verificarMissao() {
+  if (
+    progresso.flexao >= 100 &&
+    progresso.abdominal >= 100 &&
+    progresso.agachamento >= 100 &&
+    progresso.corrida >= 5
+  ) {
+    subirNivel();
+    resetarMissao();
+  }
+}
+
+// ===============================
+// NÍVEL / RANK
+// ===============================
+function subirNivel() {
+  const nivelAntigo = nivel;
+  nivel++;
+
+  mostrarMensagem(
+    "Subiu de Nível!",
+    `${nivelAntigo} → ${nivel}`
+  );
+
+  if (nivel % 10 === 0 && rankIndex < ranks.length - 1) {
+    const rankAntigo = ranks[rankIndex];
+    rankIndex++;
+
+    mostrarMensagem(
+      "Subiu de Rank!",
+      `${rankAntigo} → ${ranks[rankIndex]}`
+    );
+
+    if (ranks[rankIndex] === "S+++") {
+      mostrarMensagem(
+        "SISTEMA",
+        "Olá caçador, Eu sou o sistema, e quero dizer que você atingiu o nível MÁXIMO de poder já visto na história. PARABÉNS!"
+      );
     }
-  });
-</script>
+  }
 
-<!-- ===== SCRIPT PRINCIPAL ===== -->
-<script src="script.js"></script>
+  salvar();
+}
 
-</body>
-</html>
+// ===============================
+// RESET MISSÃO
+// ===============================
+function resetarMissao() {
+  progresso = {
+    flexao: 0,
+    abdominal: 0,
+    agachamento: 0,
+    corrida: 0
+  };
+}
+
+// ===============================
+// TIMER
+// ===============================
+document.getElementById("startBtn").addEventListener("click", () => {
+  if (timerInterval) return;
+
+  timerInterval = setInterval(() => {
+    tempo--;
+    atualizarTela();
+
+    if (tempo <= 0) {
+      clearInterval(timerInterval);
+      timerInterval = null;
+      alert("⛔ Tempo acabou! Penalidade aplicada.");
+    }
+  }, 1000);
+});
+
+// ===============================
+// ATUALIZAR TELA
+// ===============================
+function atualizarTela() {
+  document.getElementById("nivel").innerText = nivel;
+  document.getElementById("rank").innerText = ranks[rankIndex];
+
+  document.getElementById("flexao").innerText = progresso.flexao;
+  document.getElementById("abdominal").innerText = progresso.abdominal;
+  document.getElementById("agachamento").innerText = progresso.agachamento;
+  document.getElementById("corrida").innerText = progresso.corrida;
+
+  const min = String(Math.floor(tempo / 60)).padStart(2, "0");
+  const sec = String(tempo % 60).padStart(2, "0");
+  document.getElementById("tempo").innerText = `${min}:${sec}`;
+
+  salvar();
+}
+
+// ===============================
+// POPUP CENTRAL
+// ===============================
+function mostrarMensagem(titulo, texto) {
+  const popup = document.getElementById("popup");
+  const title = document.getElementById("popupTitle");
+  const text = document.getElementById("popupText");
+
+  if (!popup || !title || !text) return;
+
+  title.innerText = titulo;
+  text.innerText = texto;
+
+  popup.style.display = "flex";
+
+  setTimeout(() => {
+    popup.style.display = "none";
+  }, 3000);
+}
