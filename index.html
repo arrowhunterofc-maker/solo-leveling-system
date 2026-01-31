@@ -6,74 +6,39 @@
   <link rel="stylesheet" href="style.css">
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#0a1428">
-
-  <!-- SEO Básico -->
-  <meta name="description" content="Solo Leveling Simulator - complete suas missões diárias com flexões, abdominais, agachamentos e corrida.">
-  <meta name="keywords" content="Solo Leveling, treino, flexões, abdominais, agachamentos, corrida, missões diárias, anime, simulator">
-  <meta name="author" content="Seu Nome">
-
-  <!-- Verificação Google -->
-  <meta name="google-site-verification" content="google4601035eed900403" />
 </head>
 <body>
 
 <div class="system-panel">
   <h1>[ MISSÕES DIÁRIAS ]</h1>
 
-  <!-- Nível e Rank -->
-  <p class="nivel">Nível: <span id="nivel">1</span></p>
-  <p class="rank">Rank: <span id="rank">F+</span></p>
+  <ul>
+    <li>Flexões: <span id="flexao">0</span> / 100 <span id="ok-flexao"></span> <button onclick="treinarFlexao()">+1</button></li>
+    <li>Abdominais: <span id="abdominal">0</span> / 100 <span id="ok-abdominal"></span> <button onclick="treinarAbdominal()">+1</button></li>
+    <li>Agachamentos: <span id="agachamento">0</span> / 100 <span id="ok-agachamento"></span> <button onclick="treinarAgachamento()">+1</button></li>
+    <li>Corrida: <span id="corrida">0</span> / 5 km <span id="ok-corrida"></span> <button onclick="treinarCorrida()">+1</button></li>
+  </ul>
 
-  <!-- Mensagem de subir de nível -->
+  <p class="timer">Tempo restante: <span id="tempo">50:00</span></p>
+  <button id="startBtn">Iniciar Timer</button>
+
+  <p>Nível: <span id="nivel">1</span></p>
+  <p>Rank: <span id="rank">F+</span></p>
+
+  <!-- Mensagem de Nível -->
   <div id="levelUpMessage" class="level-up">
-    Subiu de Nível! <span id="oldLevel">0</span> → <span id="newLevel">1</span>
+    Subiu de Nível! <span id="oldLevel"></span> → <span id="newLevel"></span>
   </div>
 
-  <!-- Mensagem de subir de rank -->
+  <!-- Mensagem de Rank -->
   <div id="rankUpMessage" class="level-up">
-    Subiu de Rank! <span id="oldRank">F+</span> → <span id="newRank">E</span>
+    Subiu de Rank! <span id="oldRank"></span> → <span id="newRank"></span>
   </div>
 
   <!-- Mensagem especial S+++ -->
   <div id="maxRankMessage" class="level-up special">
-    <p>Olá caçador, eu sou o sistema, e eu quero dizer que você atingiu o nível MAXIMO, de poder já visto na história, PARABÉNS!</p>
+    Olá caçador, Eu sou o sistema, e eu quero dizer que você atingiu o nível MAXIMO, de poder já visto na história, PARABÉNS!
   </div>
-
-  <ul>
-    <li>
-      Flexões: <span id="flexao">0</span> / 100
-      <button onclick="treinarFlexao()">+1</button>
-      <span id="ok-flexao"></span>
-    </li>
-
-    <li>
-      Abdominais: <span id="abdominal">0</span> / 100
-      <button onclick="treinarAbdominal()">+1</button>
-      <span id="ok-abdominal"></span>
-    </li>
-
-    <li>
-      Agachamentos: <span id="agachamento">0</span> / 100
-      <button onclick="treinarAgachamento()">+1</button>
-      <span id="ok-agachamento"></span>
-    </li>
-
-    <li>
-      Corrida: <span id="corrida">0</span> / 5 km
-      <button onclick="treinarCorrida()">+1</button>
-      <span id="ok-corrida"></span>
-    </li>
-  </ul>
-
-  <p class="timer">
-    Tempo restante: <span id="tempo">50:00</span>
-  </p>
-
-  <button id="startBtn">Treinar</button>
-  <button id="installBtn" style="display:none;">
-    [ ATIVAR SISTEMA ]
-  </button>
-
 </div>
 
 <script src="script.js"></script>
