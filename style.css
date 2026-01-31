@@ -1,6 +1,6 @@
 body {
   background: radial-gradient(#020b1f, #000);
-  font-family: 'Orbitron', sans-serif;
+  font-family: Arial, sans-serif;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -12,33 +12,13 @@ body {
   background: rgba(10, 20, 40, 0.9);
   border: 1px solid #4fc3ff;
   padding: 25px;
-  width: 400px;
+  width: 380px;
   box-shadow: 0 0 20px #4fc3ff;
 }
 
-h1 {
-  text-align: center;
-  margin-bottom: 20px;
-  color: #7fd7ff;
-}
-
-ul {
-  list-style: none;
-  padding: 0;
-}
-
-li {
-  margin: 10px 0;
-}
-
-.timer {
-  margin-top: 20px;
-  text-align: center;
-}
-
 button {
-  margin-left: 10px;
-  padding: 5px 10px;
+  margin-top: 5px;
+  padding: 6px 10px;
   background: transparent;
   border: 1px solid #4fc3ff;
   color: #cce6ff;
@@ -46,65 +26,47 @@ button {
 }
 
 button:hover {
-  background: rgba(79,195,255,0.1);
-}
-
-/* Level Up e Rank Up com pulse */
-.level-up {
-  display: none;
-  margin-top: 20px;
-  text-align: center;
-  font-size: 22px;
-  font-weight: bold;
-  color: #4fc3ff;
-  animation: fadeInOut 2.5s ease-in-out, pulse 0.7s infinite alternate;
-}
-
-/* Mensagem especial */
-.special {
-  color: #ffcc00;
-  font-size: 18px;
-  animation: fadeInOut 5s ease-in-out, pulse 0.8s infinite alternate;
-}
-
-/* Fade in/out */
-@keyframes fadeInOut {
-  0% {opacity: 0;}
-  10% {opacity: 1;}
-  90% {opacity: 1;}
-  100% {opacity: 0;}
-}
-
-/* Pulse efeito */
-@keyframes pulse {
-  from {text-shadow: 0 0 5px #4fc3ff;}
-  to {text-shadow: 0 0 20px #00ffff;}
-}
-
-/* Barra de progresso de Rank */
-.rank-bar {
-  width: 100%;
-  height: 20px;
   background: rgba(79,195,255,0.2);
-  border: 1px solid #4fc3ff;
-  border-radius: 10px;
-  margin-bottom: 15px;
-  overflow: hidden;
-  box-shadow: 0 0 5px #4fc3ff inset;
 }
 
-#rankProgress {
-  width: 0%;
-  height: 100%;
-  background: linear-gradient(90deg, #4fc3ff, #00ffff);
-  transition: width 0.5s ease-in-out, background 1s ease-in-out;
-  box-shadow: 0 0 10px #4fc3ff, 0 0 20px #00ffff inset;
-  animation: pulseBar 1s infinite alternate;
-  border-radius: 10px;
+/* LOGIN */
+.login-screen {
+  position: fixed;
+  inset: 0;
+  background: black;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
 }
 
-/* Pulse suave da barra */
-@keyframes pulseBar {
-  from { box-shadow: 0 0 5px #4fc3ff, 0 0 10px #00ffff inset; }
-  to { box-shadow: 0 0 15px #4fc3ff, 0 0 25px #00ffff inset; }
+.login-box {
+  background: rgba(10,20,40,0.95);
+  border: 2px solid #4fc3ff;
+  padding: 30px;
+  text-align: center;
+  box-shadow: 0 0 20px #4fc3ff;
+}
+
+.login-box input {
+  padding: 10px;
+  width: 200px;
+}
+
+/* POPUP */
+.popup {
+  position: fixed;
+  inset: 0;
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 10000;
+}
+
+.popup-box {
+  background: rgba(10,20,40,0.95);
+  border: 2px solid #4fc3ff;
+  padding: 30px;
+  text-align: center;
+  box-shadow: 0 0 20px #4fc3ff;
 }
