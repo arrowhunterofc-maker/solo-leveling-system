@@ -1,13 +1,13 @@
-// ===== ELEMENTOS =====
-const loginScreen = document.getElementById("loginScreen");
-const gameScreen = document.getElementById("gameScreen");
-const startBtn = document.getElementById("startGameBtn");
-const nameInput = document.getElementById("playerNameInput");
+// ===============================
+// CONFIG
+// ===============================
+const ranks = ["F+", "E", "D", "C", "B", "A", "S", "S+", "S++", "S+++"];
 
-// ===== DADOS =====
+// ===============================
+// DADOS
+// ===============================
 let nivel = 1;
 let rankIndex = 0;
-const ranks = ["F+", "E", "D", "C", "B", "A", "S", "S+", "S++", "S+++"];
 
 let progresso = {
   flexao: 0,
@@ -16,37 +16,41 @@ let progresso = {
   corrida: 0
 };
 
-// ===== INICIAR =====
-startBtn.addEventListener("click", () => {
-  const nome = nameInput.value.trim();
-  if (!nome) {
-    alert("Digite seu nome!");
-    return;
-  }
+// ===============================
+// DATA (RESET DIÁRIO)
+// ===============================
+const hoje = new Date().toDateString();
 
-  localStorage.setItem("playerName", nome);
-  mostrarJogo();
-});
-
-// ===== MOSTRAR JOGO =====
-function mostrarJogo() {
-  loginScreen.style.display = "none";
-  gameScreen.style.display = "block";
-  atualizarTela();
+// ===============================
+// SALVAR / CARREGAR
+// ===============================
+function salvar() {
+  localStorage.setItem("solo_save", JSON.stringify({
+    nivel,
+    rankIndex,
+    progresso,
+    ultimoDia: hoje
+  }));
 }
 
-// ===== AO ABRIR SITE =====
-window.addEventListener("load", () => {
-  const nome = localStorage.getItem("playerName");
-  if (nome) {
-    mostrarJogo();
-  } else {
-    loginScreen.style.display = "flex";
-    gameScreen.style.display = "none";
-  }
-});
+function carregar() {
+  const dados = JSON.parse(localStorage.getItem("solo_save"));
+  if (!dados) return;
 
-// ===== TREINOS =====
+  nivel = dados.nivel;
+  rankIndex = dados.rankIndex;
+
+  // se mudou o dia, reseta missão
+  if (dados.ultimoDia !== hoje) {
+    resetarMissao();
+  } else {
+    progresso = dados.progresso;
+  }
+}
+
+// ===============================
+// MISSÕES
+// ===============================
 function treinarFlexao() {
   if (progresso.flexao < 100) progresso.flexao++;
   verificarMissao();
@@ -71,7 +75,9 @@ function treinarCorrida() {
   atualizarTela();
 }
 
-// ===== MISSÃO COMPLETA =====
+// ===============================
+// VERIFICA MISSÃO COMPLETA
+// ===============================
 function verificarMissao() {
   if (
     progresso.flexao >= 100 &&
@@ -80,11 +86,13 @@ function verificarMissao() {
     progresso.corrida >= 5
   ) {
     subirNivel();
-    resetar();
+    resetarMissao();
   }
 }
 
-// ===== NÍVEL / RANK =====
+// ===============================
+// NÍVEL / RANK
+// ===============================
 function subirNivel() {
   nivel++;
 
@@ -93,12 +101,21 @@ function subirNivel() {
   }
 }
 
-// ===== RESET =====
-function resetar() {
-  progresso = { flexao: 0, abdominal: 0, agachamento: 0, corrida: 0 };
+// ===============================
+// RESET
+// ===============================
+function resetarMissao() {
+  progresso = {
+    flexao: 0,
+    abdominal: 0,
+    agachamento: 0,
+    corrida: 0
+  };
 }
 
-// ===== UI =====
+// ===============================
+// UI
+// ===============================
 function atualizarTela() {
   document.getElementById("flexao").innerText = progresso.flexao;
   document.getElementById("abdominal").innerText = progresso.abdominal;
@@ -107,4 +124,12 @@ function atualizarTela() {
 
   document.getElementById("nivel").innerText = nivel;
   document.getElementById("rank").innerText = ranks[rankIndex];
+
+  salvar();
 }
+
+// ===============================
+// INICIAR
+// ===============================
+carregar();
+atualizarTela();
