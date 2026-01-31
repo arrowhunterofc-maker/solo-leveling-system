@@ -3,15 +3,18 @@ let flexao = 0;
 let abdominal = 0;
 let agachamento = 0;
 let corrida = 0;
-let nivel = 1; // nível inicial
+let nivel = 1;
 
-// ===== FUNÇÕES DE TREINO =====
+const ranks = ["F+", "E", "D", "C", "B", "A", "S", "S+", "S++", "S+++"];
+let rankIndex = 0;
+
+// ===== TREINO =====
 function treinarFlexao() {
   if (flexao < 100 && !tempoAcabou) {
     flexao++;
     document.getElementById("flexao").innerText = flexao;
     if (flexao === 100) document.getElementById("ok-flexao").innerText = " ✔️";
-    verificarNivel();
+    verificarMissaoCompleta();
   }
 }
 
@@ -20,7 +23,7 @@ function treinarAbdominal() {
     abdominal++;
     document.getElementById("abdominal").innerText = abdominal;
     if (abdominal === 100) document.getElementById("ok-abdominal").innerText = " ✔️";
-    verificarNivel();
+    verificarMissaoCompleta();
   }
 }
 
@@ -29,7 +32,7 @@ function treinarAgachamento() {
     agachamento++;
     document.getElementById("agachamento").innerText = agachamento;
     if (agachamento === 100) document.getElementById("ok-agachamento").innerText = " ✔️";
-    verificarNivel();
+    verificarMissaoCompleta();
   }
 }
 
@@ -38,51 +41,70 @@ function treinarCorrida() {
     corrida++;
     document.getElementById("corrida").innerText = corrida;
     if (corrida === 5) document.getElementById("ok-corrida").innerText = " ✔️";
-    verificarNivel();
+    verificarMissaoCompleta();
   }
 }
 
-// ===== FUNÇÃO DE NÍVEL =====
-function verificarNivel() {
+// ===== VERIFICA MISSÃO =====
+function verificarMissaoCompleta() {
   if (flexao === 100 && abdominal === 100 && agachamento === 100 && corrida === 5) {
     subirNivel();
   }
 }
 
+// ===== SUBIR NÍVEL =====
 function subirNivel() {
   const oldLevel = nivel;
   nivel++;
   document.getElementById("nivel").innerText = nivel;
 
-  // Mostrar a animação
-  const message = document.getElementById("levelUpMessage");
+  // Mensagem nível
+  const levelMsg = document.getElementById("levelUpMessage");
   document.getElementById("oldLevel").innerText = oldLevel;
   document.getElementById("newLevel").innerText = nivel;
-  message.style.display = "block";
+  levelMsg.style.display = "block";
+  setTimeout(() => { levelMsg.style.display = "none"; }, 2500);
 
-  // Esconder a mensagem após 2.5 segundos
-  setTimeout(() => {
-    message.style.display = "none";
-  }, 2500);
-
-  // Resetar missões para o próximo dia
-  flexao = 0;
-  abdominal = 0;
-  agachamento = 0;
-  corrida = 0;
-
+  // Resetar missões
+  flexao = 0; abdominal = 0; agachamento = 0; corrida = 0;
   document.getElementById("flexao").innerText = flexao;
   document.getElementById("abdominal").innerText = abdominal;
   document.getElementById("agachamento").innerText = agachamento;
   document.getElementById("corrida").innerText = corrida;
-  
   document.getElementById("ok-flexao").innerText = "";
   document.getElementById("ok-abdominal").innerText = "";
   document.getElementById("ok-agachamento").innerText = "";
   document.getElementById("ok-corrida").innerText = "";
+
+  // Subir rank se não é máximo
+  if (nivel % 10 === 0 && rankIndex < ranks.length - 1) {
+    subirRank();
+  }
 }
 
-// ===== TIMER DE 50 MINUTOS =====
+// ===== SUBIR RANK =====
+function subirRank() {
+  const oldRank = ranks[rankIndex];
+  rankIndex++;
+  const newRank = ranks[rankIndex];
+  document.getElementById("rank").innerText = newRank;
+
+  // Mensagem rank
+  const rankMsg = document.getElementById("rankUpMessage");
+  document.getElementById("oldRank").innerText = oldRank;
+  document.getElementById("newRank").innerText = newRank;
+  rankMsg.style.display = "block";
+  setTimeout(() => { rankMsg.style.display = "none"; }, 2500);
+
+  // Mensagem especial S+++
+  if (newRank === "S+++") {
+    const msg = document.getElementById("maxRankMessage");
+    msg.style.display = "block";
+    setTimeout(() => { msg.style.display = "none"; }, 5000);
+  }
+}
+
+// ===== TIMER 50 MIN =====
 let timerInterval;
 let tempoMinutos = 50;
 let tempoSegundos = 0;
