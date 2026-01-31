@@ -1,10 +1,10 @@
 // ===============================
-// CONFIG
+// CONFIGURAÇÃO
 // ===============================
 const ranks = ["F+", "E", "D", "C", "B", "A", "S", "S+", "S++", "S+++"];
 
 // ===============================
-// DADOS
+// DADOS DO JOGADOR
 // ===============================
 let nivel = 1;
 let rankIndex = 0;
@@ -40,7 +40,6 @@ function carregar() {
   nivel = dados.nivel;
   rankIndex = dados.rankIndex;
 
-  // se mudou o dia, reseta missão
   if (dados.ultimoDia !== hoje) {
     resetarMissao();
   } else {
@@ -49,7 +48,7 @@ function carregar() {
 }
 
 // ===============================
-// MISSÕES
+// TREINOS
 // ===============================
 function treinarFlexao() {
   if (progresso.flexao < 100) progresso.flexao++;
@@ -76,7 +75,7 @@ function treinarCorrida() {
 }
 
 // ===============================
-// VERIFICA MISSÃO COMPLETA
+// MISSÃO COMPLETA
 // ===============================
 function verificarMissao() {
   if (
@@ -91,18 +90,24 @@ function verificarMissao() {
 }
 
 // ===============================
-// NÍVEL / RANK
+// LEVEL / RANK UP
 // ===============================
 function subirNivel() {
+  const nivelAntigo = nivel;
   nivel++;
 
+  mostrarPopup(`LEVEL UP! ${nivelAntigo} → ${nivel}`);
+
   if (nivel % 10 === 0 && rankIndex < ranks.length - 1) {
+    const rankAntigo = ranks[rankIndex];
     rankIndex++;
+
+    mostrarPopup(`RANK UP! ${rankAntigo} → ${ranks[rankIndex]}`);
   }
 }
 
 // ===============================
-// RESET
+// RESET MISSÃO
 // ===============================
 function resetarMissao() {
   progresso = {
@@ -114,7 +119,7 @@ function resetarMissao() {
 }
 
 // ===============================
-// UI
+// ATUALIZAR UI
 // ===============================
 function atualizarTela() {
   document.getElementById("flexao").innerText = progresso.flexao;
@@ -126,6 +131,21 @@ function atualizarTela() {
   document.getElementById("rank").innerText = ranks[rankIndex];
 
   salvar();
+}
+
+// ===============================
+// POPUP
+// ===============================
+function mostrarPopup(texto) {
+  const popup = document.getElementById("popup");
+  const popupText = document.getElementById("popupText");
+
+  popupText.innerText = texto;
+  popup.style.display = "flex";
+
+  setTimeout(() => {
+    popup.style.display = "none";
+  }, 2500);
 }
 
 // ===============================
