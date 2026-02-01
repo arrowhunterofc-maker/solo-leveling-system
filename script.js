@@ -23,9 +23,10 @@ if (data.lastDay !== today) {
   data.completedToday = false;
   data.bonus = Math.random() < 0.05;
   data.lastDay = today;
+
+  if (data.bonus) showBonus();
 }
 
-// LIMITES
 const maxNormal = 100;
 const maxBonus = 150;
 
@@ -33,7 +34,6 @@ function max(type) {
   return data.bonus && type !== "corrida" ? maxBonus : maxNormal;
 }
 
-// ATUALIZA TELA
 function update() {
   document.getElementById("flexao").innerText = data.flexao;
   document.getElementById("abdominal").innerText = data.abdominal;
@@ -50,7 +50,6 @@ function update() {
   localStorage.setItem("soloSystem", JSON.stringify(data));
 }
 
-// ADICIONAR TREINO
 function add(type) {
   if (data.completedToday) return;
 
@@ -61,7 +60,6 @@ function add(type) {
   }
 }
 
-// VERIFICA CONCLUSÃO
 function checkComplete() {
   if (data.completedToday) return;
 
@@ -76,7 +74,6 @@ function checkComplete() {
   }
 }
 
-// SUBIR NÍVEL
 function levelUp(qtd) {
   for (let i = 0; i < qtd; i++) {
     const oldLevel = data.nivel;
@@ -95,18 +92,15 @@ function levelUp(qtd) {
   update();
 }
 
-// POPUP ANIMADO
 function showPopup(text) {
   const p = document.getElementById("popup");
   p.innerText = text;
-
   p.style.display = "block";
   p.style.animation = "none";
-  p.offsetHeight; // força reflow
-  p.style.animation = "popup 2.5s ease forwards";
+  p.offsetHeight;
+  p.style.animation = "popup 2.8s ease forwards";
 }
 
-// BONUS
 function showBonus() {
   const b = document.getElementById("bonus");
   b.innerText = "⚠ MISSÃO BÔNUS ATIVADA!\nObjetivos aumentados!";
@@ -116,5 +110,4 @@ function showBonus() {
   b.style.animation = "popup 3s ease forwards";
 }
 
-if (data.bonus) showBonus();
 update();
