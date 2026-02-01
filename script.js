@@ -1,29 +1,48 @@
-const ranks = ["F+", "E", "D", "C", "B", "A", "S", "S+", "S++", "S+++"];
-
-let data = JSON.parse(localStorage.getItem("soloSystem")) || {
-  nivel: 1,
-  rankIndex: 0,
-  streak: 0,
-
+// ============================
+// DADOS DO JOGADOR
+// ============================
+let data = {
   flexao: 0,
   abdominal: 0,
   agachamento: 0,
   corrida: 0,
-
-  bonus: false
+  nivel: 1,
+  rankIndex: 0,
+  streak: 0,
+  lastComplete: null
 };
 
-// chance de missão bônus a cada ciclo
-data.bonus = Math.random() < 0.05;
+const ranks = ["F", "F+", "E", "E+", "D", "D+", "C", "C+", "B", "B+", "A", "A+", "S", "S+", "S++", "S+++"];
 
-const maxNormal = 100;
-const maxBonus = 150;
+const metasBase = {
+  flexao: 100,
+  abdominal: 100,
+  agachamento: 100,
+  corrida: 5
+};
 
-function max(type) {
-  return data.bonus && type !== "corrida" ? maxBonus : maxNormal;
+let metas = { ...metasBase };
+
+// ============================
+// LOAD / SAVE
+// ============================
+function salvar() {
+  localStorage.setItem("playerData", JSON.stringify(data));
 }
 
-function update() {
+function carregar() {
+  const salvo = localStorage.getItem("playerData");
+  if (salvo) {
+    data = JSON.parse(salvo);
+  }
+}
+
+carregar();
+
+// ============================
+// ATUALIZAR TELA
+// ============================
+function atualizarTela() {
   document.getElementById("flexao").innerText = data.flexao;
   document.getElementById("abdominal").innerText = data.abdominal;
   document.getElementById("agachamento").innerText = data.agachamento;
@@ -31,75 +50,117 @@ function update() {
 
   document.getElementById("nivel").innerText = data.nivel;
   document.getElementById("rank").innerText = ranks[data.rankIndex];
-
-  localStorage.setItem("soloSystem", JSON.stringify(data));
 }
 
-function add(type) {
-  if (data[type] < max(type)) {
-    data[type]++;
-    update();
-    checkComplete();
-  }
+atualizarTela();
+
+// ============================
+// TREINOS
+// ============================
+function treinarFlexao() {
+  data.flexao++;
+  verificarMissao();
+  salvar();
+  atualizarTela();
 }
 
-function checkComplete() {
+function treinarAbdominal() {
+  data.abdominal++;
+  verificarMissao();
+  salvar();
+  atualizarTela();
+}
+
+function treinarAgachamento() {
+  data.agachamento++;
+  verificarMissao();
+  salvar();
+  atualizarTela();
+}
+
+function treinarCorrida() {
+  data.corrida++;
+  verificarMissao();
+  salvar();
+  atualizarTela();
+}
+
+// ============================
+// MISSÃO DIÁRIA
+// ============================
+function verificarMissao() {
   if (
-    data.flexao >= max("flexao") &&
-    data.abdominal >= max("abdominal") &&
-    data.agachamento >= max("agachamento") &&
-    data.corrida >= 5
+    data.flexao >= metas.flexao &&
+    data.abdominal >= metas.abdominal &&
+    data.agachamento >= metas.agachamento &&
+    data.corrida >= metas.corrida
   ) {
-    missionComplete();
+    completarMissao();
   }
 }
 
-function missionComplete() {
-  // streak sobe sempre
-  data.streak++;
-
-  // level up
-  levelUp(data.bonus ? 2 : 1);
-
-  // reseta missão imediatamente
-  resetMission();
-
-  // nova chance de bônus
-  data.bonus = Math.random() < 0.05;
+function completarMissao() {
+  subirNivel(1);
+  atualizarStreak();
+  resetarMissao();
 }
 
-function resetMission() {
+// ============================
+// RESET MISSÃO
+// ============================
+function resetarMissao() {
   data.flexao = 0;
   data.abdominal = 0;
   data.agachamento = 0;
   data.corrida = 0;
 }
 
-function levelUp(qtd) {
-  for (let i = 0; i < qtd; i++) {
-    const oldLevel = data.nivel;
-    data.nivel++;
-    showPopup(`LEVEL UP<br>${oldLevel} → ${data.nivel}`);
+// ============================
+// LEVEL / RANK
+// ============================
+function subirNivel(qtd) {
+  const antigo = data.nivel;
+  data.nivel += qtd;
 
-    if (
-      data.rankIndex < ranks.length - 1 &&
-      data.nivel % 10 === 0
-    ) {
-      const oldRank = ranks[data.rankIndex];
-      data.rankIndex++;
-      showPopup(`RANK UP<br>${oldRank} → ${ranks[data.rankIndex]}`);
-    }
+  mostrarPopup(`LEVEL UP! ${antigo} → ${data.nivel}`);
+
+  if (data.nivel % 5 === 0 && data.rankIndex < ranks.length - 1) {
+    const rankAntigo = ranks[data.rankIndex];
+    data.rankIndex++;
+    mostrarPopup(`RANK UP! ${rankAntigo} → ${ranks[data.rankIndex]}`);
   }
-  update();
 }
 
-function showPopup(text) {
-  const p = document.getElementById("popup");
-  p.innerHTML = text;
-  p.style.display = "block";
-  p.style.animation = "none";
-  p.offsetHeight;
-  p.style.animation = "popup 2.5s ease forwards";
+// ============================
+// STREAK
+// ============================
+function atualizarStreak() {
+  const hoje = new Date().toDateString();
+
+  if (data.lastComplete === hoje) return;
+
+  const ontem = new Date();
+  ontem.setDate(ontem.getDate() - 1);
+
+  if (data.lastComplete === ontem.toDateString()) {
+    data.streak++;
+  } else {
+    data.streak = 1;
+  }
+
+  data.lastComplete = hoje;
 }
 
-update();
+// ============================
+// POPUP
+// ============================
+function mostrarPopup(texto) {
+  const div = document.createElement("div");
+  div.className = "level-popup";
+  div.innerText = texto;
+  document.body.appendChild(div);
+
+  setTimeout(() => {
+    div.remove();
+  }, 3000);
+}
