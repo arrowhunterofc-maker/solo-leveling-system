@@ -1,155 +1,163 @@
-// ===============================
-// CONFIGURAÇÃO
-// ===============================
+/***********************
+ * CONFIGURAÇÕES BASE *
+ ***********************/
+const DAILY_DATE_KEY = "dailyDate";
+const EXTRA_MISSION_KEY = "extraMission";
+
+// objetivos padrão
+let objetivoFlexao = 100;
+let objetivoAbdominal = 100;
+let objetivoAgachamento = 100;
+let objetivoCorrida = 5;
+
+// progresso
+let flexao = 0;
+let abdominal = 0;
+let agachamento = 0;
+let corrida = 0;
+
+// nível e rank
+let nivel = parseInt(localStorage.getItem("nivel")) || 1;
+let rankIndex = parseInt(localStorage.getItem("rankIndex")) || 0;
+
 const ranks = ["F+", "E", "D", "C", "B", "A", "S", "S+", "S++", "S+++"];
 
-// ===============================
-// DADOS DO JOGADOR
-// ===============================
-let nivel = 1;
-let rankIndex = 0;
+/***********************
+ * RESET DIÁRIO *
+ ***********************/
+function checkDailyReset() {
+  const hoje = new Date().toLocaleDateString();
+  const lastDate = localStorage.getItem(DAILY_DATE_KEY);
 
-let progresso = {
-  flexao: 0,
-  abdominal: 0,
-  agachamento: 0,
-  corrida: 0
-};
-
-// ===============================
-// DATA (RESET DIÁRIO)
-// ===============================
-const hoje = new Date().toDateString();
-
-// ===============================
-// SALVAR / CARREGAR
-// ===============================
-function salvar() {
-  localStorage.setItem("solo_save", JSON.stringify({
-    nivel,
-    rankIndex,
-    progresso,
-    ultimoDia: hoje
-  }));
-}
-
-function carregar() {
-  const dados = JSON.parse(localStorage.getItem("solo_save"));
-  if (!dados) return;
-
-  nivel = dados.nivel;
-  rankIndex = dados.rankIndex;
-
-  if (dados.ultimoDia !== hoje) {
-    resetarMissao();
-  } else {
-    progresso = dados.progresso;
+  if (lastDate !== hoje) {
+    resetDailyMissions();
+    localStorage.setItem(DAILY_DATE_KEY, hoje);
   }
 }
 
-// ===============================
-// TREINOS
-// ===============================
-function treinarFlexao() {
-  if (progresso.flexao < 100) progresso.flexao++;
-  verificarMissao();
+function resetDailyMissions() {
+  flexao = 0;
+  abdominal = 0;
+  agachamento = 0;
+  corrida = 0;
+
+  // sorteia missão extra (2%)
+  const extraMission = Math.random() < 0.02;
+  localStorage.setItem(EXTRA_MISSION_KEY, extraMission);
+
+  if (extraMission) {
+    objetivoFlexao = 150;
+    objetivoAbdominal = 150;
+    objetivoAgachamento = 150;
+    alert("⚠️ MISSÃO EXTRA ATIVADA!\nObjetivos aumentados hoje!");
+  } else {
+    objetivoFlexao = 100;
+    objetivoAbdominal = 100;
+    objetivoAgachamento = 100;
+  }
+
   atualizarTela();
+}
+
+/***********************
+ * TREINOS *
+ ***********************/
+function treinarFlexao() {
+  if (flexao < objetivoFlexao) {
+    flexao++;
+    checkComplete();
+  }
 }
 
 function treinarAbdominal() {
-  if (progresso.abdominal < 100) progresso.abdominal++;
-  verificarMissao();
-  atualizarTela();
+  if (abdominal < objetivoAbdominal) {
+    abdominal++;
+    checkComplete();
+  }
 }
 
 function treinarAgachamento() {
-  if (progresso.agachamento < 100) progresso.agachamento++;
-  verificarMissao();
-  atualizarTela();
+  if (agachamento < objetivoAgachamento) {
+    agachamento++;
+    checkComplete();
+  }
 }
 
 function treinarCorrida() {
-  if (progresso.corrida < 5) progresso.corrida++;
-  verificarMissao();
-  atualizarTela();
+  if (corrida < objetivoCorrida) {
+    corrida++;
+    checkComplete();
+  }
 }
 
-// ===============================
-// MISSÃO COMPLETA
-// ===============================
-function verificarMissao() {
+/***********************
+ * CHECK COMPLETO *
+ ***********************/
+function checkComplete() {
+  atualizarTela();
+
   if (
-    progresso.flexao >= 100 &&
-    progresso.abdominal >= 100 &&
-    progresso.agachamento >= 100 &&
-    progresso.corrida >= 5
+    flexao >= objetivoFlexao &&
+    abdominal >= objetivoAbdominal &&
+    agachamento >= objetivoAgachamento &&
+    corrida >= objetivoCorrida
   ) {
     subirNivel();
-    resetarMissao();
   }
 }
 
-// ===============================
-// LEVEL / RANK UP
-// ===============================
+/***********************
+ * LEVEL & RANK *
+ ***********************/
 function subirNivel() {
-  const nivelAntigo = nivel;
+  const oldLevel = nivel;
   nivel++;
+  localStorage.setItem("nivel", nivel);
 
-  mostrarPopup(`LEVEL UP! ${nivelAntigo} → ${nivel}`);
+  mostrarLevelUp(oldLevel, nivel);
 
+  // sobe rank a cada 10 níveis (até S+++)
   if (nivel % 10 === 0 && rankIndex < ranks.length - 1) {
-    const rankAntigo = ranks[rankIndex];
+    const oldRank = ranks[rankIndex];
     rankIndex++;
-
-    mostrarPopup(`RANK UP! ${rankAntigo} → ${ranks[rankIndex]}`);
+    localStorage.setItem("rankIndex", rankIndex);
+    mostrarRankUp(oldRank, ranks[rankIndex]);
   }
 }
 
-// ===============================
-// RESET MISSÃO
-// ===============================
-function resetarMissao() {
-  progresso = {
-    flexao: 0,
-    abdominal: 0,
-    agachamento: 0,
-    corrida: 0
-  };
+function mostrarLevelUp(oldL, newL) {
+  const msg = document.getElementById("levelUpMessage");
+  document.getElementById("oldLevel").innerText = oldL;
+  document.getElementById("newLevel").innerText = newL;
+
+  msg.classList.add("show");
+  setTimeout(() => msg.classList.remove("show"), 3000);
 }
 
-// ===============================
-// ATUALIZAR UI
-// ===============================
+function mostrarRankUp(oldR, newR) {
+  const msg = document.getElementById("rankUpMessage");
+  document.getElementById("oldRank").innerText = oldR;
+  document.getElementById("newRank").innerText = newR;
+
+  msg.classList.add("show");
+  setTimeout(() => msg.classList.remove("show"), 3000);
+}
+
+/***********************
+ * ATUALIZAR TELA *
+ ***********************/
 function atualizarTela() {
-  document.getElementById("flexao").innerText = progresso.flexao;
-  document.getElementById("abdominal").innerText = progresso.abdominal;
-  document.getElementById("agachamento").innerText = progresso.agachamento;
-  document.getElementById("corrida").innerText = progresso.corrida;
+  document.getElementById("flexao").innerText = flexao;
+  document.getElementById("abdominal").innerText = abdominal;
+  document.getElementById("agachamento").innerText = agachamento;
+  document.getElementById("corrida").innerText = corrida;
 
   document.getElementById("nivel").innerText = nivel;
   document.getElementById("rank").innerText = ranks[rankIndex];
-
-  salvar();
 }
 
-// ===============================
-// POPUP
-// ===============================
-function mostrarPopup(texto) {
-  const popup = document.getElementById("popup");
-  const popupText = document.getElementById("popupText");
-
-  popupText.innerText = texto;
-  popup.style.display = "flex";
-
-  setTimeout(() => {
-    popup.style.display = "none";
-  }, 2500);
-}
-
-// ===============================
-// INICIAR
-// ===============================
-carregar();
+/***********************
+ * INICIAR *
+ ***********************/
+checkDailyReset();
 atualizarTela();
