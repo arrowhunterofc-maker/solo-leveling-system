@@ -1,163 +1,102 @@
-/***********************
- * CONFIGURAÇÕES BASE *
- ***********************/
-const DAILY_DATE_KEY = "dailyDate";
-const EXTRA_MISSION_KEY = "extraMission";
-
-// objetivos padrão
-let objetivoFlexao = 100;
-let objetivoAbdominal = 100;
-let objetivoAgachamento = 100;
-let objetivoCorrida = 5;
-
-// progresso
-let flexao = 0;
-let abdominal = 0;
-let agachamento = 0;
-let corrida = 0;
-
-// nível e rank
-let nivel = parseInt(localStorage.getItem("nivel")) || 1;
-let rankIndex = parseInt(localStorage.getItem("rankIndex")) || 0;
-
 const ranks = ["F+", "E", "D", "C", "B", "A", "S", "S+", "S++", "S+++"];
 
-/***********************
- * RESET DIÁRIO *
- ***********************/
-function checkDailyReset() {
-  const hoje = new Date().toLocaleDateString();
-  const lastDate = localStorage.getItem(DAILY_DATE_KEY);
+let data = JSON.parse(localStorage.getItem("soloSystem")) || {
+  nivel: 1,
+  rankIndex: 0,
+  flexao: 0,
+  abdominal: 0,
+  agachamento: 0,
+  corrida: 0,
+  bonus: false,
+  lastDay: ""
+};
 
-  if (lastDate !== hoje) {
-    resetDailyMissions();
-    localStorage.setItem(DAILY_DATE_KEY, hoje);
+const today = new Date().toISOString().slice(0,10);
+
+// RESET DIÁRIO
+if (data.lastDay !== today) {
+  data.flexao = 0;
+  data.abdominal = 0;
+  data.agachamento = 0;
+  data.corrida = 0;
+  data.bonus = Math.random() < 0.05;
+  data.lastDay = today;
+
+  if (data.bonus) {
+    showBonus();
   }
 }
 
-function resetDailyMissions() {
-  flexao = 0;
-  abdominal = 0;
-  agachamento = 0;
-  corrida = 0;
+const maxNormal = 100;
+const maxBonus = 150;
 
-  // sorteia missão extra (2%)
-  const extraMission = Math.random() < 0.02;
-  localStorage.setItem(EXTRA_MISSION_KEY, extraMission);
-
-  if (extraMission) {
-    objetivoFlexao = 150;
-    objetivoAbdominal = 150;
-    objetivoAgachamento = 150;
-    alert("⚠️ MISSÃO EXTRA ATIVADA!\nObjetivos aumentados hoje!");
-  } else {
-    objetivoFlexao = 100;
-    objetivoAbdominal = 100;
-    objetivoAgachamento = 100;
-  }
-
-  atualizarTela();
+function max(type) {
+  return data.bonus && type !== "corrida" ? maxBonus : maxNormal;
 }
 
-/***********************
- * TREINOS *
- ***********************/
-function treinarFlexao() {
-  if (flexao < objetivoFlexao) {
-    flexao++;
+function update() {
+  document.getElementById("flexao").innerText = data.flexao;
+  document.getElementById("abdominal").innerText = data.abdominal;
+  document.getElementById("agachamento").innerText = data.agachamento;
+  document.getElementById("corrida").innerText = data.corrida;
+
+  document.getElementById("flexaoMax").innerText = max("flexao");
+  document.getElementById("abdominalMax").innerText = max("abdominal");
+  document.getElementById("agachamentoMax").innerText = max("agachamento");
+
+  document.getElementById("nivel").innerText = data.nivel;
+  document.getElementById("rank").innerText = ranks[data.rankIndex];
+
+  localStorage.setItem("soloSystem", JSON.stringify(data));
+}
+
+function add(type) {
+  if (data[type] < max(type)) {
+    data[type]++;
     checkComplete();
+    update();
   }
 }
 
-function treinarAbdominal() {
-  if (abdominal < objetivoAbdominal) {
-    abdominal++;
-    checkComplete();
-  }
-}
-
-function treinarAgachamento() {
-  if (agachamento < objetivoAgachamento) {
-    agachamento++;
-    checkComplete();
-  }
-}
-
-function treinarCorrida() {
-  if (corrida < objetivoCorrida) {
-    corrida++;
-    checkComplete();
-  }
-}
-
-/***********************
- * CHECK COMPLETO *
- ***********************/
 function checkComplete() {
-  atualizarTela();
-
   if (
-    flexao >= objetivoFlexao &&
-    abdominal >= objetivoAbdominal &&
-    agachamento >= objetivoAgachamento &&
-    corrida >= objetivoCorrida
+    data.flexao >= max("flexao") &&
+    data.abdominal >= max("abdominal") &&
+    data.agachamento >= max("agachamento") &&
+    data.corrida >= 5
   ) {
-    subirNivel();
+    levelUp(data.bonus ? 2 : 1);
   }
 }
 
-/***********************
- * LEVEL & RANK *
- ***********************/
-function subirNivel() {
-  const oldLevel = nivel;
-  nivel++;
-  localStorage.setItem("nivel", nivel);
+function levelUp(qtd) {
+  for (let i = 0; i < qtd; i++) {
+    const old = data.nivel;
+    data.nivel++;
+    popup(`Level Up! ${old} → ${data.nivel}`);
 
-  mostrarLevelUp(oldLevel, nivel);
-
-  // sobe rank a cada 10 níveis (até S+++)
-  if (nivel % 10 === 0 && rankIndex < ranks.length - 1) {
-    const oldRank = ranks[rankIndex];
-    rankIndex++;
-    localStorage.setItem("rankIndex", rankIndex);
-    mostrarRankUp(oldRank, ranks[rankIndex]);
+    if (data.rankIndex < ranks.length - 1 && data.nivel % 10 === 0) {
+      const oldRank = ranks[data.rankIndex];
+      data.rankIndex++;
+      popup(`Rank Up! ${oldRank} → ${ranks[data.rankIndex]}`);
+    }
   }
 }
 
-function mostrarLevelUp(oldL, newL) {
-  const msg = document.getElementById("levelUpMessage");
-  document.getElementById("oldLevel").innerText = oldL;
-  document.getElementById("newLevel").innerText = newL;
-
-  msg.classList.add("show");
-  setTimeout(() => msg.classList.remove("show"), 3000);
+function popup(text) {
+  const p = document.getElementById("popup");
+  p.innerText = text;
+  p.style.animation = "none";
+  p.offsetHeight;
+  p.style.animation = "";
 }
 
-function mostrarRankUp(oldR, newR) {
-  const msg = document.getElementById("rankUpMessage");
-  document.getElementById("oldRank").innerText = oldR;
-  document.getElementById("newRank").innerText = newR;
-
-  msg.classList.add("show");
-  setTimeout(() => msg.classList.remove("show"), 3000);
+function showBonus() {
+  const b = document.getElementById("bonus");
+  b.innerText = "⚠ MISSÃO BÔNUS ATIVADA!\nObjetivos aumentados!";
+  b.style.animation = "none";
+  b.offsetHeight;
+  b.style.animation = "";
 }
 
-/***********************
- * ATUALIZAR TELA *
- ***********************/
-function atualizarTela() {
-  document.getElementById("flexao").innerText = flexao;
-  document.getElementById("abdominal").innerText = abdominal;
-  document.getElementById("agachamento").innerText = agachamento;
-  document.getElementById("corrida").innerText = corrida;
-
-  document.getElementById("nivel").innerText = nivel;
-  document.getElementById("rank").innerText = ranks[rankIndex];
-}
-
-/***********************
- * INICIAR *
- ***********************/
-checkDailyReset();
-atualizarTela();
+update();
