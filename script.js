@@ -3,29 +3,18 @@ const ranks = ["F+", "E", "D", "C", "B", "A", "S", "S+", "S++", "S+++"];
 let data = JSON.parse(localStorage.getItem("soloSystem")) || {
   nivel: 1,
   rankIndex: 0,
+  streak: 0,
+
   flexao: 0,
   abdominal: 0,
   agachamento: 0,
   corrida: 0,
-  bonus: false,
-  completedToday: false,
-  lastDay: ""
+
+  bonus: false
 };
 
-const today = new Date().toISOString().slice(0, 10);
-
-// RESET DIÁRIO
-if (data.lastDay !== today) {
-  data.flexao = 0;
-  data.abdominal = 0;
-  data.agachamento = 0;
-  data.corrida = 0;
-  data.completedToday = false;
-  data.bonus = Math.random() < 0.05;
-  data.lastDay = today;
-
-  if (data.bonus) showBonus();
-}
+// chance de missão bônus a cada ciclo
+data.bonus = Math.random() < 0.05;
 
 const maxNormal = 100;
 const maxBonus = 150;
@@ -40,10 +29,6 @@ function update() {
   document.getElementById("agachamento").innerText = data.agachamento;
   document.getElementById("corrida").innerText = data.corrida;
 
-  document.getElementById("flexaoMax").innerText = max("flexao");
-  document.getElementById("abdominalMax").innerText = max("abdominal");
-  document.getElementById("agachamentoMax").innerText = max("agachamento");
-
   document.getElementById("nivel").innerText = data.nivel;
   document.getElementById("rank").innerText = ranks[data.rankIndex];
 
@@ -51,8 +36,6 @@ function update() {
 }
 
 function add(type) {
-  if (data.completedToday) return;
-
   if (data[type] < max(type)) {
     data[type]++;
     update();
@@ -61,24 +44,42 @@ function add(type) {
 }
 
 function checkComplete() {
-  if (data.completedToday) return;
-
   if (
     data.flexao >= max("flexao") &&
     data.abdominal >= max("abdominal") &&
     data.agachamento >= max("agachamento") &&
     data.corrida >= 5
   ) {
-    data.completedToday = true;
-    levelUp(data.bonus ? 2 : 1);
+    missionComplete();
   }
+}
+
+function missionComplete() {
+  // streak sobe sempre
+  data.streak++;
+
+  // level up
+  levelUp(data.bonus ? 2 : 1);
+
+  // reseta missão imediatamente
+  resetMission();
+
+  // nova chance de bônus
+  data.bonus = Math.random() < 0.05;
+}
+
+function resetMission() {
+  data.flexao = 0;
+  data.abdominal = 0;
+  data.agachamento = 0;
+  data.corrida = 0;
 }
 
 function levelUp(qtd) {
   for (let i = 0; i < qtd; i++) {
     const oldLevel = data.nivel;
     data.nivel++;
-    showPopup(`Level Up! ${oldLevel} → ${data.nivel}`);
+    showPopup(`LEVEL UP<br>${oldLevel} → ${data.nivel}`);
 
     if (
       data.rankIndex < ranks.length - 1 &&
@@ -86,7 +87,7 @@ function levelUp(qtd) {
     ) {
       const oldRank = ranks[data.rankIndex];
       data.rankIndex++;
-      showPopup(`Rank Up! ${oldRank} → ${ranks[data.rankIndex]}`);
+      showPopup(`RANK UP<br>${oldRank} → ${ranks[data.rankIndex]}`);
     }
   }
   update();
@@ -94,20 +95,11 @@ function levelUp(qtd) {
 
 function showPopup(text) {
   const p = document.getElementById("popup");
-  p.innerText = text;
+  p.innerHTML = text;
   p.style.display = "block";
   p.style.animation = "none";
   p.offsetHeight;
-  p.style.animation = "popup 2.8s ease forwards";
-}
-
-function showBonus() {
-  const b = document.getElementById("bonus");
-  b.innerText = "⚠ MISSÃO BÔNUS ATIVADA!\nObjetivos aumentados!";
-  b.style.display = "block";
-  b.style.animation = "none";
-  b.offsetHeight;
-  b.style.animation = "popup 3s ease forwards";
+  p.style.animation = "popup 2.5s ease forwards";
 }
 
 update();
