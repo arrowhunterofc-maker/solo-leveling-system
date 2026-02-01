@@ -23,10 +23,9 @@ if (data.lastDay !== today) {
   data.completedToday = false;
   data.bonus = Math.random() < 0.05;
   data.lastDay = today;
-
-  if (data.bonus) showBonus();
 }
 
+// LIMITES
 const maxNormal = 100;
 const maxBonus = 150;
 
@@ -34,6 +33,7 @@ function max(type) {
   return data.bonus && type !== "corrida" ? maxBonus : maxNormal;
 }
 
+// ATUALIZA TELA
 function update() {
   document.getElementById("flexao").innerText = data.flexao;
   document.getElementById("abdominal").innerText = data.abdominal;
@@ -50,16 +50,18 @@ function update() {
   localStorage.setItem("soloSystem", JSON.stringify(data));
 }
 
+// ADICIONAR TREINO
 function add(type) {
   if (data.completedToday) return;
 
   if (data[type] < max(type)) {
     data[type]++;
-    checkComplete();
     update();
+    checkComplete();
   }
 }
 
+// VERIFICA CONCLUSÃO
 function checkComplete() {
   if (data.completedToday) return;
 
@@ -74,11 +76,12 @@ function checkComplete() {
   }
 }
 
+// SUBIR NÍVEL
 function levelUp(qtd) {
   for (let i = 0; i < qtd; i++) {
     const oldLevel = data.nivel;
     data.nivel++;
-    popup(`Level Up! ${oldLevel} → ${data.nivel}`);
+    showPopup(`Level Up! ${oldLevel} → ${data.nivel}`);
 
     if (
       data.rankIndex < ranks.length - 1 &&
@@ -86,26 +89,32 @@ function levelUp(qtd) {
     ) {
       const oldRank = ranks[data.rankIndex];
       data.rankIndex++;
-      popup(`Rank Up! ${oldRank} → ${ranks[data.rankIndex]}`);
+      showPopup(`Rank Up! ${oldRank} → ${ranks[data.rankIndex]}`);
     }
   }
+  update();
 }
 
-function popup(text) {
+// POPUP ANIMADO
+function showPopup(text) {
   const p = document.getElementById("popup");
   p.innerText = text;
+
+  p.style.display = "block";
   p.style.animation = "none";
-  p.offsetHeight;
-  p.style.animation = "";
+  p.offsetHeight; // força reflow
+  p.style.animation = "popup 2.5s ease forwards";
 }
 
+// BONUS
 function showBonus() {
   const b = document.getElementById("bonus");
   b.innerText = "⚠ MISSÃO BÔNUS ATIVADA!\nObjetivos aumentados!";
+  b.style.display = "block";
   b.style.animation = "none";
   b.offsetHeight;
-  b.style.animation = "";
+  b.style.animation = "popup 3s ease forwards";
 }
 
+if (data.bonus) showBonus();
 update();
-
