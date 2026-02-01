@@ -8,10 +8,11 @@ let data = JSON.parse(localStorage.getItem("soloSystem")) || {
   agachamento: 0,
   corrida: 0,
   bonus: false,
+  completedToday: false,
   lastDay: ""
 };
 
-const today = new Date().toISOString().slice(0,10);
+const today = new Date().toISOString().slice(0, 10);
 
 // RESET DIÁRIO
 if (data.lastDay !== today) {
@@ -19,12 +20,11 @@ if (data.lastDay !== today) {
   data.abdominal = 0;
   data.agachamento = 0;
   data.corrida = 0;
+  data.completedToday = false;
   data.bonus = Math.random() < 0.05;
   data.lastDay = today;
 
-  if (data.bonus) {
-    showBonus();
-  }
+  if (data.bonus) showBonus();
 }
 
 const maxNormal = 100;
@@ -51,6 +51,8 @@ function update() {
 }
 
 function add(type) {
+  if (data.completedToday) return;
+
   if (data[type] < max(type)) {
     data[type]++;
     checkComplete();
@@ -59,23 +61,29 @@ function add(type) {
 }
 
 function checkComplete() {
+  if (data.completedToday) return;
+
   if (
     data.flexao >= max("flexao") &&
     data.abdominal >= max("abdominal") &&
     data.agachamento >= max("agachamento") &&
     data.corrida >= 5
   ) {
+    data.completedToday = true;
     levelUp(data.bonus ? 2 : 1);
   }
 }
 
 function levelUp(qtd) {
   for (let i = 0; i < qtd; i++) {
-    const old = data.nivel;
+    const oldLevel = data.nivel;
     data.nivel++;
-    popup(`Level Up! ${old} → ${data.nivel}`);
+    popup(`Level Up! ${oldLevel} → ${data.nivel}`);
 
-    if (data.rankIndex < ranks.length - 1 && data.nivel % 10 === 0) {
+    if (
+      data.rankIndex < ranks.length - 1 &&
+      data.nivel % 10 === 0
+    ) {
       const oldRank = ranks[data.rankIndex];
       data.rankIndex++;
       popup(`Rank Up! ${oldRank} → ${ranks[data.rankIndex]}`);
@@ -100,3 +108,4 @@ function showBonus() {
 }
 
 update();
+
