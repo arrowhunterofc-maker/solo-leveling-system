@@ -7,40 +7,34 @@
 </head>
 <body>
 
-<div class="layout">
-  <div class="system-panel">
-    <h1>[ MISSÕES DIÁRIAS ]</h1>
+<div class="system-panel">
+  <h1>[ MISSÕES DIÁRIAS ]</h1>
 
-    <ul class="missions">
-      <li>
-        <span class="label">Flexões:</span>
-        <span class="value" id="flexao">0</span>
-        <button onclick="add('flexao')">+1</button>
-      </li>
+  <ul class="missions">
+    <li>
+      <span>Flexões: <strong id="flexao">0</strong></span>
+      <button onclick="add('flexao')">+1</button>
+    </li>
 
-      <li>
-        <span class="label">Abdominais:</span>
-        <span class="value" id="abdominal">0</span>
-        <button onclick="add('abdominal')">+1</button>
-      </li>
+    <li>
+      <span>Abdominais: <strong id="abdominal">0</strong></span>
+      <button onclick="add('abdominal')">+1</button>
+    </li>
 
-      <li>
-        <span class="label">Agachamentos:</span>
-        <span class="value" id="agachamento">0</span>
-        <button onclick="add('agachamento')">+1</button>
-      </li>
+    <li>
+      <span>Agachamentos: <strong id="agachamento">0</strong></span>
+      <button onclick="add('agachamento')">+1</button>
+    </li>
 
-      <li>
-        <span class="label">Corrida:</span>
-        <span class="value"><span id="corrida">0</span> km</span>
-        <button onclick="add('corrida')">+1</button>
-      </li>
-    </ul>
+    <li>
+      <span>Corrida: <strong><span id="corrida">0</span> km</strong></span>
+      <button onclick="add('corrida')">+1</button>
+    </li>
+  </ul>
 
-    <div class="status">
-      <p>Nível: <span id="nivel">1</span></p>
-      <p>Rank: <span id="rank">F+</span></p>
-    </div>
+  <div class="status">
+    <p>Nível: <span id="nivel">1</span></p>
+    <p>Rank: <span id="rank">F+</span></p>
   </div>
 </div>
 
