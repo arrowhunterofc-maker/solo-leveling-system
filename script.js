@@ -14,24 +14,22 @@ let data = {
 
 const ranks = ["F", "F+", "E", "E+", "D", "D+", "C", "C+", "B", "B+", "A", "A+", "S", "S+", "S++", "S+++"];
 
-const metasBase = {
+const metas = {
   flexao: 100,
   abdominal: 100,
   agachamento: 100,
   corrida: 5
 };
 
-let metas = { ...metasBase };
-
 // ============================
 // LOAD / SAVE
 // ============================
 function salvar() {
-  localStorage.setItem("playerData", JSON.stringify(data));
+  localStorage.setItem("solo_save", JSON.stringify(data));
 }
 
 function carregar() {
-  const salvo = localStorage.getItem("playerData");
+  const salvo = localStorage.getItem("solo_save");
   if (salvo) {
     data = JSON.parse(salvo);
   }
@@ -55,38 +53,19 @@ function atualizarTela() {
 atualizarTela();
 
 // ============================
-// TREINOS
+// FUNÇÃO USADA PELO HTML (+1)
 // ============================
-function treinarFlexao() {
-  data.flexao++;
-  verificarMissao();
-  salvar();
-  atualizarTela();
-}
+function add(tipo) {
+  if (!data.hasOwnProperty(tipo)) return;
 
-function treinarAbdominal() {
-  data.abdominal++;
-  verificarMissao();
-  salvar();
-  atualizarTela();
-}
-
-function treinarAgachamento() {
-  data.agachamento++;
-  verificarMissao();
-  salvar();
-  atualizarTela();
-}
-
-function treinarCorrida() {
-  data.corrida++;
+  data[tipo]++;
   verificarMissao();
   salvar();
   atualizarTela();
 }
 
 // ============================
-// MISSÃO DIÁRIA
+// MISSÃO
 // ============================
 function verificarMissao() {
   if (
@@ -103,11 +82,10 @@ function completarMissao() {
   subirNivel(1);
   atualizarStreak();
   resetarMissao();
+  salvar();
+  atualizarTela();
 }
 
-// ============================
-// RESET MISSÃO
-// ============================
 function resetarMissao() {
   data.flexao = 0;
   data.abdominal = 0;
@@ -121,13 +99,12 @@ function resetarMissao() {
 function subirNivel(qtd) {
   const antigo = data.nivel;
   data.nivel += qtd;
-
   mostrarPopup(`LEVEL UP! ${antigo} → ${data.nivel}`);
 
   if (data.nivel % 5 === 0 && data.rankIndex < ranks.length - 1) {
-    const rankAntigo = ranks[data.rankIndex];
+    const rAntigo = ranks[data.rankIndex];
     data.rankIndex++;
-    mostrarPopup(`RANK UP! ${rankAntigo} → ${ranks[data.rankIndex]}`);
+    mostrarPopup(`RANK UP! ${rAntigo} → ${ranks[data.rankIndex]}`);
   }
 }
 
@@ -160,7 +137,5 @@ function mostrarPopup(texto) {
   div.innerText = texto;
   document.body.appendChild(div);
 
-  setTimeout(() => {
-    div.remove();
-  }, 3000);
+  setTimeout(() => div.remove(), 3000);
 }
