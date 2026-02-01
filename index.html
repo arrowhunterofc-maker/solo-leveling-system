@@ -2,7 +2,7 @@
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8">
-  <title>Solo Leveling Simulator</title>
+  <title>Solo Leveling System</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -11,30 +11,27 @@
   <h1>[ MISSÕES DIÁRIAS ]</h1>
 
   <ul>
-    <li>Flexões: <span id="flexao">0</span> / 100
-      <button onclick="treinarFlexao()">+1</button>
+    <li>Flexões: <span id="flexao">0</span> / <span id="flexaoMax">100</span>
+      <button onclick="add('flexao')">+1</button>
     </li>
-    <li>Abdominais: <span id="abdominal">0</span> / 100
-      <button onclick="treinarAbdominal()">+1</button>
+    <li>Abdominais: <span id="abdominal">0</span> / <span id="abdominalMax">100</span>
+      <button onclick="add('abdominal')">+1</button>
     </li>
-    <li>Agachamentos: <span id="agachamento">0</span> / 100
-      <button onclick="treinarAgachamento()">+1</button>
+    <li>Agachamentos: <span id="agachamento">0</span> / <span id="agachamentoMax">100</span>
+      <button onclick="add('agachamento')">+1</button>
     </li>
     <li>Corrida: <span id="corrida">0</span> / 5 km
-      <button onclick="treinarCorrida()">+1</button>
+      <button onclick="add('corrida')">+1</button>
     </li>
   </ul>
 
-  <p>Nível: <span id="nivel">1</span></p>
-  <p>Rank: <span id="rank">F+</span></p>
+  <p class="info">Nível: <span id="nivel">1</span></p>
+  <p class="info">Rank: <span id="rank">F+</span></p>
 </div>
 
-<!-- POPUP -->
-<div id="popup" class="popup">
-  <div class="popup-box">
-    <p id="popupText"></p>
-  </div>
-</div>
+<!-- MENSAGENS -->
+<div id="popup" class="popup"></div>
+<div id="bonus" class="popup bonus"></div>
 
 <script src="script.js"></script>
 </body>
