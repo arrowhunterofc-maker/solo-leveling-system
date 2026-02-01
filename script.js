@@ -1,7 +1,18 @@
-// ============================
-// DADOS DO JOGADOR
-// ============================
-let data = {
+// ========================
+// SOLO LEVELING SYSTEM
+// ========================
+
+// ---------- CONFIG ----------
+const RANKS = ["F+", "E", "D", "C", "B", "A", "S", "S+", "S++", "S+++"];
+const MAX = {
+  flexao: 100,
+  abdominal: 100,
+  agachamento: 100,
+  corrida: 5
+};
+
+// ---------- SAVE ----------
+let data = JSON.parse(localStorage.getItem("solo_system")) || {
   flexao: 0,
   abdominal: 0,
   agachamento: 0,
@@ -12,115 +23,112 @@ let data = {
   lastComplete: null
 };
 
-const ranks = ["F", "F+", "E", "E+", "D", "D+", "C", "C+", "B", "B+", "A", "A+", "S", "S+", "S++", "S+++"];
-
-const metas = {
-  flexao: 100,
-  abdominal: 100,
-  agachamento: 100,
-  corrida: 5
-};
-
-// ============================
-// LOAD / SAVE
-// ============================
-function salvar() {
-  localStorage.setItem("solo_save", JSON.stringify(data));
-}
-
-function carregar() {
-  const salvo = localStorage.getItem("solo_save");
-  if (salvo) {
-    data = JSON.parse(salvo);
-  }
-}
-
-carregar();
-
-// ============================
-// ATUALIZAR TELA
-// ============================
-function atualizarTela() {
+// ---------- UI ----------
+function atualizarUI() {
   document.getElementById("flexao").innerText = data.flexao;
   document.getElementById("abdominal").innerText = data.abdominal;
   document.getElementById("agachamento").innerText = data.agachamento;
   document.getElementById("corrida").innerText = data.corrida;
 
   document.getElementById("nivel").innerText = data.nivel;
-  document.getElementById("rank").innerText = ranks[data.rankIndex];
+  document.getElementById("rank").innerText = RANKS[data.rankIndex];
+
+  document.getElementById("ok-flexao").innerText =
+    data.flexao >= MAX.flexao ? "✔" : "";
+
+  document.getElementById("ok-abdominal").innerText =
+    data.abdominal >= MAX.abdominal ? "✔" : "";
+
+  document.getElementById("ok-agachamento").innerText =
+    data.agachamento >= MAX.agachamento ? "✔" : "";
+
+  document.getElementById("ok-corrida").innerText =
+    data.corrida >= MAX.corrida ? "✔" : "";
 }
 
-atualizarTela();
+// ---------- SAVE ----------
+function salvar() {
+  localStorage.setItem("solo_system", JSON.stringify(data));
+}
 
-// ============================
-// FUNÇÃO USADA PELO HTML (+1)
-// ============================
+// ---------- ADD GENERIC ----------
 function add(tipo) {
-  if (!data.hasOwnProperty(tipo)) return;
+  if (data[tipo] >= MAX[tipo]) {
+    data[tipo] = MAX[tipo];
+    atualizarUI();
+    return;
+  }
 
   data[tipo]++;
-  verificarMissao();
+  atualizarUI();
+  checarConclusao();
   salvar();
-  atualizarTela();
 }
 
-// ============================
-// MISSÃO
-// ============================
-function verificarMissao() {
-  if (
-    data.flexao >= metas.flexao &&
-    data.abdominal >= metas.abdominal &&
-    data.agachamento >= metas.agachamento &&
-    data.corrida >= metas.corrida
-  ) {
-    completarMissao();
+// ---------- BUTTONS ----------
+function treinarFlexao() { add("flexao"); }
+function treinarAbdominal() { add("abdominal"); }
+function treinarAgachamento() { add("agachamento"); }
+function treinarCorrida() { add("corrida"); }
+
+// ---------- CHECK COMPLETE ----------
+function checarConclusao() {
+  const completa =
+    data.flexao >= MAX.flexao &&
+    data.abdominal >= MAX.abdominal &&
+    data.agachamento >= MAX.agachamento &&
+    data.corrida >= MAX.corrida;
+
+  if (completa) {
+    subirNivel();
+    atualizarStreak();
+    resetarMissao();
   }
 }
 
-function completarMissao() {
-  subirNivel(1);
-  atualizarStreak();
-  resetarMissao();
-  salvar();
-  atualizarTela();
+// ---------- LEVEL ----------
+function subirNivel() {
+  const oldLevel = data.nivel;
+  data.nivel++;
+
+  mostrarMensagem(
+    `LEVEL UP!<br>${oldLevel} → ${data.nivel}`
+  );
+
+  checarRank();
 }
 
-function resetarMissao() {
-  data.flexao = 0;
-  data.abdominal = 0;
-  data.agachamento = 0;
-  data.corrida = 0;
-}
+// ---------- RANK ----------
+function checarRank() {
+  if (data.rankIndex >= RANKS.length - 1) return;
 
-// ============================
-// LEVEL / RANK
-// ============================
-function subirNivel(qtd) {
-  const antigo = data.nivel;
-  data.nivel += qtd;
-  mostrarPopup(`LEVEL UP! ${antigo} → ${data.nivel}`);
-
-  if (data.nivel % 5 === 0 && data.rankIndex < ranks.length - 1) {
-    const rAntigo = ranks[data.rankIndex];
+  if (data.nivel % 10 === 0) {
+    const oldRank = RANKS[data.rankIndex];
     data.rankIndex++;
-    mostrarPopup(`RANK UP! ${rAntigo} → ${ranks[data.rankIndex]}`);
+    const newRank = RANKS[data.rankIndex];
+
+    mostrarMensagem(
+      `RANK UP!<br>${oldRank} → ${newRank}`
+    );
+
+    if (newRank === "S+++") {
+      mostrarMensagem(
+        "Olá caçador.<br>Eu sou o sistema.<br><br>Você atingiu o NÍVEL MÁXIMO de poder já visto na história.<br><br>PARABÉNS!",
+        true
+      );
+    }
   }
 }
 
-// ============================
-// STREAK
-// ============================
+// ---------- STREAK ----------
 function atualizarStreak() {
   const hoje = new Date().toDateString();
 
   if (data.lastComplete === hoje) return;
 
-  const ontem = new Date();
-  ontem.setDate(ontem.getDate() - 1);
-
-  if (data.lastComplete === ontem.toDateString()) {
-    data.streak++;
+  if (data.lastComplete) {
+    const ontem = new Date(Date.now() - 86400000).toDateString();
+    data.streak = data.lastComplete === ontem ? data.streak + 1 : 1;
   } else {
     data.streak = 1;
   }
@@ -128,14 +136,25 @@ function atualizarStreak() {
   data.lastComplete = hoje;
 }
 
-// ============================
-// POPUP
-// ============================
-function mostrarPopup(texto) {
-  const div = document.createElement("div");
-  div.className = "level-popup";
-  div.innerText = texto;
-  document.body.appendChild(div);
-
-  setTimeout(() => div.remove(), 3000);
+// ---------- RESET ----------
+function resetarMissao() {
+  data.flexao = 0;
+  data.abdominal = 0;
+  data.agachamento = 0;
+  data.corrida = 0;
 }
+
+// ---------- MESSAGE ----------
+function mostrarMensagem(texto, especial = false) {
+  const box = document.createElement("div");
+  box.className = especial ? "level-up special" : "level-up";
+  box.innerHTML = texto;
+
+  document.body.appendChild(box);
+
+  setTimeout(() => box.remove(), 3500);
+}
+
+// ---------- INIT ----------
+atualizarUI();
+salvar();
