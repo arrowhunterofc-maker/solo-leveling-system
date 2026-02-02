@@ -11,16 +11,16 @@ const goals = {
 };
 
 // ========================
-// SAVE / LOAD
+// LOAD SEGURO (ANTI-NaN)
 // ========================
-let data = JSON.parse(localStorage.getItem("solo_system")) || {
-  nivel: 1,
-  rankIndex: 0,
-  flexao: 0,
-  abdominal: 0,
-  agachamento: 0,
-  corrida: 0
-};
+let data = JSON.parse(localStorage.getItem("solo_system")) || {};
+
+data.nivel = Number(data.nivel) || 1;
+data.rankIndex = Number(data.rankIndex) || 0;
+data.flexao = Number(data.flexao) || 0;
+data.abdominal = Number(data.abdominal) || 0;
+data.agachamento = Number(data.agachamento) || 0;
+data.corrida = Number(data.corrida) || 0;
 
 save();
 updateUI();
@@ -45,6 +45,8 @@ function treinarCorrida() {
 }
 
 function add(tipo, valor) {
+  if (typeof data[tipo] !== "number") data[tipo] = 0;
+
   if (data[tipo] >= goals[tipo]) return;
 
   data[tipo] += valor;
@@ -79,17 +81,14 @@ function checkComplete() {
 // ========================
 function levelUp() {
   const oldLevel = data.nivel;
-  data.nivel++;
+  data.nivel += 1;
 
   showLevelUp(oldLevel, data.nivel);
 
-  // Rank sobe a cada 10 níveis
-  if (data.rankIndex < ranks.length - 1) {
-    if (data.nivel % 10 === 0) {
-      const oldRank = ranks[data.rankIndex];
-      data.rankIndex++;
-      showRankUp(oldRank, ranks[data.rankIndex]);
-    }
+  if (data.rankIndex < ranks.length - 1 && data.nivel % 10 === 0) {
+    const oldRank = ranks[data.rankIndex];
+    data.rankIndex++;
+    showRankUp(oldRank, ranks[data.rankIndex]);
   }
 
   save();
