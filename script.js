@@ -12,7 +12,7 @@ const LIMITS = {
 };
 
 // ======================
-// SAVE BLINDADO
+// SAVE / LOAD
 // ======================
 let data;
 
@@ -29,7 +29,9 @@ if (!data || typeof data !== "object") {
     agachamento: 0,
     corrida: 0,
     nivel: 1,
-    rankIndex: 0
+    rankIndex: 0,
+    streak: 0,
+    lastCompleteDate: null
   };
   save();
 }
@@ -41,6 +43,11 @@ function save() {
 // ======================
 // UI
 // ======================
+function setText(id, value) {
+  const el = document.getElementById(id);
+  if (el) el.innerText = value;
+}
+
 function updateUI() {
   setText("flexao", data.flexao);
   setText("abdominal", data.abdominal);
@@ -49,11 +56,7 @@ function updateUI() {
 
   setText("nivel", data.nivel);
   setText("rank", RANKS[data.rankIndex]);
-}
-
-function setText(id, value) {
-  const el = document.getElementById(id);
-  if (el) el.innerText = value;
+  setText("streak", data.streak);
 }
 
 // ======================
@@ -80,11 +83,50 @@ function isMissionComplete() {
   );
 }
 
+// ======================
+// STREAK
+// ======================
+function handleStreak() {
+  const today = new Date().toISOString().split("T")[0];
+
+  if (!data.lastCompleteDate) {
+    data.streak = 1;
+  } else {
+    const last = new Date(data.lastCompleteDate);
+    const diffDays =
+      (new Date(today) - last) / (1000 * 60 * 60 * 24);
+
+    if (diffDays === 1) {
+      data.streak++;
+    } else if (diffDays > 1) {
+      data.streak = 1;
+    }
+  }
+
+  data.lastCompleteDate = today;
+}
+
+// ======================
+// CONCLUSÃO DA MISSÃO
+// ======================
 function handleMissionComplete() {
+  handleStreak();
+
+  // nível normal
   levelUp();
 
-  // espera a animação antes de resetar
-  setTimeout(resetMission, 2000);
+  // bônus de streak a cada 7 dias
+  if (data.streak > 0 && data.streak % 7 === 0) {
+    setTimeout(() => {
+      const oldLevel = data.nivel;
+      data.nivel++;
+      showPopup(`BONUS DE STREAK! 🔥<br>${oldLevel} → ${data.nivel}`);
+      save();
+      updateUI();
+    }, 1200);
+  }
+
+  setTimeout(resetMission, 2500);
 }
 
 function resetMission() {
@@ -117,7 +159,7 @@ function levelUp() {
 
     setTimeout(() => {
       showPopup(`RANK UP!<br>${oldRank} → ${RANKS[data.rankIndex]}`);
-    }, 600);
+    }, 700);
   }
 
   save();
@@ -133,24 +175,18 @@ function showPopup(text) {
   box.innerHTML = text;
   document.body.appendChild(box);
 
-  setTimeout(() => box.remove(), 2500);
+  setTimeout(() => {
+    box.remove();
+  }, 2500);
 }
 
 // ======================
-// BOTÕES
+// BOTÕES (+1)
 // ======================
-function treinarFlexao() {
-  add("flexao");
-}
-function treinarAbdominal() {
-  add("abdominal");
-}
-function treinarAgachamento() {
-  add("agachamento");
-}
-function treinarCorrida() {
-  add("corrida");
-}
+function treinarFlexao() { add("flexao"); }
+function treinarAbdominal() { add("abdominal"); }
+function treinarAgachamento() { add("agachamento"); }
+function treinarCorrida() { add("corrida"); }
 
 // ======================
 updateUI();
