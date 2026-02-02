@@ -1,104 +1,113 @@
-// ========================
-// CONFIGURAÇÕES
-// ========================
-const ranks = ["F+", "E", "D", "C", "B", "A", "S", "S+", "S++", "S+++"];
+// =======================
+// CONFIGURAÇÃO INICIAL
+// =======================
 
-const goals = {
-  flexao: 100,
-  abdominal: 100,
-  agachamento: 100,
-  corrida: 5
+const RANKS = ["F+", "E", "D", "C", "B", "A", "S", "S+", "S++", "S+++"];
+
+const DEFAULT_DATA = {
+  flexao: 0,
+  abdominal: 0,
+  agachamento: 0,
+  corrida: 0,
+  nivel: 1,
+  rankIndex: 0,
+  streak: 0
 };
 
-// ========================
-// LOAD SEGURO (ANTI-NaN)
-// ========================
-let data = JSON.parse(localStorage.getItem("solo_system")) || {};
+let data = JSON.parse(localStorage.getItem("solo_system"));
 
-data.nivel = Number(data.nivel) || 1;
-data.rankIndex = Number(data.rankIndex) || 0;
-data.flexao = Number(data.flexao) || 0;
-data.abdominal = Number(data.abdominal) || 0;
-data.agachamento = Number(data.agachamento) || 0;
-data.corrida = Number(data.corrida) || 0;
+if (!data) {
+  data = { ...DEFAULT_DATA };
+  save();
+}
 
-save();
+// =======================
+// SALVAR / ATUALIZAR UI
+// =======================
+
+function save() {
+  localStorage.setItem("solo_system", JSON.stringify(data));
+}
+
+function updateUI() {
+  document.getElementById("flexao").innerText = data.flexao;
+  document.getElementById("abdominal").innerText = data.abdominal;
+  document.getElementById("agachamento").innerText = data.agachamento;
+  document.getElementById("corrida").innerText = data.corrida;
+
+  document.getElementById("nivel").innerText = data.nivel;
+  document.getElementById("rank").innerText = RANKS[data.rankIndex];
+
+  document.getElementById("ok-flexao").innerText = data.flexao >= 100 ? "✔" : "";
+  document.getElementById("ok-abdominal").innerText = data.abdominal >= 100 ? "✔" : "";
+  document.getElementById("ok-agachamento").innerText = data.agachamento >= 100 ? "✔" : "";
+  document.getElementById("ok-corrida").innerText = data.corrida >= 5 ? "✔" : "";
+}
+
 updateUI();
 
-// ========================
-// FUNÇÕES DE TREINO
-// ========================
+// =======================
+// BOTÕES +1
+// =======================
+
 function treinarFlexao() {
-  add("flexao", 1);
+  if (data.flexao < 100) {
+    data.flexao++;
+    checkComplete();
+    save();
+    updateUI();
+  }
 }
 
 function treinarAbdominal() {
-  add("abdominal", 1);
+  if (data.abdominal < 100) {
+    data.abdominal++;
+    checkComplete();
+    save();
+    updateUI();
+  }
 }
 
 function treinarAgachamento() {
-  add("agachamento", 1);
+  if (data.agachamento < 100) {
+    data.agachamento++;
+    checkComplete();
+    save();
+    updateUI();
+  }
 }
 
 function treinarCorrida() {
-  add("corrida", 1);
-}
-
-function add(tipo, valor) {
-  if (typeof data[tipo] !== "number") data[tipo] = 0;
-
-  if (data[tipo] >= goals[tipo]) return;
-
-  data[tipo] += valor;
-
-  if (data[tipo] > goals[tipo]) {
-    data[tipo] = goals[tipo];
+  if (data.corrida < 5) {
+    data.corrida++;
+    checkComplete();
+    save();
+    updateUI();
   }
-
-  save();
-  updateUI();
-  checkComplete();
 }
 
-// ========================
+// =======================
 // CHECK MISSÃO COMPLETA
-// ========================
+// =======================
+
 function checkComplete() {
-  const complete =
-    data.flexao >= goals.flexao &&
-    data.abdominal >= goals.abdominal &&
-    data.agachamento >= goals.agachamento &&
-    data.corrida >= goals.corrida;
-
-  if (complete) {
-    levelUp();
-    resetMissions();
+  if (
+    data.flexao >= 100 &&
+    data.abdominal >= 100 &&
+    data.agachamento >= 100 &&
+    data.corrida >= 5
+  ) {
+    completeMission();
   }
 }
 
-// ========================
-// LEVEL UP
-// ========================
-function levelUp() {
-  const oldLevel = data.nivel;
-  data.nivel += 1;
+// =======================
+// MISSÃO COMPLETA
+// =======================
 
-  showLevelUp(oldLevel, data.nivel);
+function completeMission() {
+  levelUp(1);
 
-  if (data.rankIndex < ranks.length - 1 && data.nivel % 10 === 0) {
-    const oldRank = ranks[data.rankIndex];
-    data.rankIndex++;
-    showRankUp(oldRank, ranks[data.rankIndex]);
-  }
-
-  save();
-  updateUI();
-}
-
-// ========================
-// RESET MISSÕES
-// ========================
-function resetMissions() {
   data.flexao = 0;
   data.abdominal = 0;
   data.agachamento = 0;
@@ -108,57 +117,50 @@ function resetMissions() {
   updateUI();
 }
 
-// ========================
-// UI
-// ========================
-function updateUI() {
-  document.getElementById("flexao").innerText = data.flexao;
-  document.getElementById("abdominal").innerText = data.abdominal;
-  document.getElementById("agachamento").innerText = data.agachamento;
-  document.getElementById("corrida").innerText = data.corrida;
+// =======================
+// LEVEL UP
+// =======================
 
-  document.getElementById("nivel").innerText = data.nivel;
-  document.getElementById("rank").innerText = ranks[data.rankIndex];
+function levelUp(amount) {
+  const oldLevel = data.nivel;
+  data.nivel += amount;
 
-  document.getElementById("ok-flexao").innerText =
-    data.flexao >= goals.flexao ? "✅" : "";
+  showLevelUp(oldLevel, data.nivel);
 
-  document.getElementById("ok-abdominal").innerText =
-    data.abdominal >= goals.abdominal ? "✅" : "";
+  const newRankIndex = Math.min(
+    Math.floor((data.nivel - 1) / 10),
+    RANKS.length - 1
+  );
 
-  document.getElementById("ok-agachamento").innerText =
-    data.agachamento >= goals.agachamento ? "✅" : "";
+  if (newRankIndex > data.rankIndex) {
+    const oldRank = RANKS[data.rankIndex];
+    data.rankIndex = newRankIndex;
+    const newRank = RANKS[data.rankIndex];
+    showRankUp(oldRank, newRank);
+  }
 
-  document.getElementById("ok-corrida").innerText =
-    data.corrida >= goals.corrida ? "✅" : "";
+  save();
+  updateUI();
 }
 
-// ========================
+// =======================
 // ANIMAÇÕES
-// ========================
-function showLevelUp(oldLv, newLv) {
+// =======================
+
+function showLevelUp(oldL, newL) {
   const box = document.getElementById("levelUpMessage");
-  box.innerHTML = `LEVEL UP<br>${oldLv} → ${newLv}`;
-  box.style.display = "flex";
+  document.getElementById("oldLevel").innerText = oldL;
+  document.getElementById("newLevel").innerText = newL;
 
-  setTimeout(() => {
-    box.style.display = "none";
-  }, 3000);
+  box.style.display = "block";
+  setTimeout(() => (box.style.display = "none"), 3000);
 }
 
-function showRankUp(oldRank, newRank) {
+function showRankUp(oldR, newR) {
   const box = document.getElementById("rankUpMessage");
-  box.innerHTML = `RANK UP<br>${oldRank} → ${newRank}`;
-  box.style.display = "flex";
+  document.getElementById("oldRank").innerText = oldR;
+  document.getElementById("newRank").innerText = newR;
 
-  setTimeout(() => {
-    box.style.display = "none";
-  }, 3000);
-}
-
-// ========================
-// SAVE
-// ========================
-function save() {
-  localStorage.setItem("solo_system", JSON.stringify(data));
+  box.style.display = "block";
+  setTimeout(() => (box.style.display = "none"), 3500);
 }
