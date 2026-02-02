@@ -42,23 +42,18 @@ function save() {
 // UI
 // ======================
 function updateUI() {
-  document.getElementById("flexao").innerText = data.flexao;
-  document.getElementById("abdominal").innerText = data.abdominal;
-  document.getElementById("agachamento").innerText = data.agachamento;
-  document.getElementById("corrida").innerText = data.corrida;
+  setText("flexao", data.flexao);
+  setText("abdominal", data.abdominal);
+  setText("agachamento", data.agachamento);
+  setText("corrida", data.corrida);
 
-  document.getElementById("nivel").innerText = data.nivel;
-  document.getElementById("rank").innerText = RANKS[data.rankIndex];
-
-  showCheck("flexao");
-  showCheck("abdominal");
-  showCheck("agachamento");
-  showCheck("corrida");
+  setText("nivel", data.nivel);
+  setText("rank", RANKS[data.rankIndex]);
 }
 
-function showCheck(type) {
-  document.getElementById(`ok-${type}`).innerText =
-    data[type] >= LIMITS[type] ? "✔" : "";
+function setText(id, value) {
+  const el = document.getElementById(id);
+  if (el) el.innerText = value;
 }
 
 // ======================
@@ -89,9 +84,7 @@ function handleMissionComplete() {
   levelUp();
 
   // espera a animação antes de resetar
-  setTimeout(() => {
-    resetMission();
-  }, 2000);
+  setTimeout(resetMission, 2000);
 }
 
 function resetMission() {
@@ -140,9 +133,7 @@ function showPopup(text) {
   box.innerHTML = text;
   document.body.appendChild(box);
 
-  setTimeout(() => {
-    box.remove();
-  }, 2500);
+  setTimeout(() => box.remove(), 2500);
 }
 
 // ======================
