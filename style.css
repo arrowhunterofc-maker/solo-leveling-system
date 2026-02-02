@@ -1,124 +1,125 @@
-body {
-  background: radial-gradient(#020b1f, #000);
-  font-family: 'Orbitron', sans-serif;
-  color: #cce6ff;
+/* ===== RESET ===== */
+* {
   margin: 0;
-  height: 100vh;
-  width: 100vw;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Arial", sans-serif;
+}
 
-  /* Centralização perfeita */
+/* ===== BODY ===== */
+body {
+  background: radial-gradient(circle at top, #0a1428, #020617);
+  min-height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
+  color: #ffffff;
 }
 
-/* PAINEL PRINCIPAL */
+/* ===== PAINEL PRINCIPAL ===== */
 .system-panel {
   background: rgba(10, 20, 40, 0.95);
-  border: 1px solid #4fc3ff;
-  padding: 25px;
-  width: 380px;
-  box-shadow: 0 0 25px #4fc3ff;
-  box-sizing: border-box;
+  border: 2px solid #1f3b70;
+  border-radius: 16px;
+  padding: 25px 30px;
+  width: 420px;
+  box-shadow: 0 0 30px rgba(0, 80, 255, 0.25);
 }
 
-/* TÍTULO */
-h1 {
+/* ===== TÍTULO ===== */
+.system-panel h1 {
   text-align: center;
   margin-bottom: 20px;
-  color: #7fd7ff;
-  font-size: 20px;
+  color: #6aa6ff;
+  letter-spacing: 1px;
 }
 
-/* LISTA DE MISSÕES */
-.missions {
+/* ===== LISTA DE MISSÕES ===== */
+.system-panel ul {
   list-style: none;
-  padding: 0;
-  margin: 0;
+  margin-bottom: 20px;
 }
 
-.missions li {
+.system-panel li {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  margin: 12px 0;
-  text-align: left;
-  gap: 10px;
-}
-
-.missions span {
+  justify-content: space-between;
+  margin-bottom: 12px;
   font-size: 16px;
 }
 
-/* BOTÕES */
-button {
-  background: transparent;
-  border: 1px solid #4fc3ff;
-  color: #cce6ff;
-  cursor: pointer;
-  padding: 4px 12px;
-  font-size: 14px;
-  border-radius: 4px;
-}
-
-button:hover {
-  background: rgba(79,195,255,0.15);
-}
-
-/* STATUS (NÍVEL E RANK) */
-.status {
-  margin-top: 25px;
-  border-top: 1px solid #4fc3ff;
-  padding-top: 15px;
+.system-panel li span {
+  margin: 0 8px;
+  min-width: 32px;
   text-align: center;
 }
 
-.status p {
-  margin: 6px 0;
+/* ===== BOTÕES +1 ===== */
+.system-panel button {
+  background: linear-gradient(135deg, #1f3b70, #274a8a);
+  border: none;
+  border-radius: 8px;
+  color: #ffffff;
+  padding: 6px 12px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: 0.2s;
+}
+
+.system-panel button:hover {
+  background: linear-gradient(135deg, #2e5cb8, #3b7cff);
+  transform: scale(1.05);
+}
+
+/* ===== NÍVEL E RANK ===== */
+.system-panel p {
+  margin-top: 8px;
   font-size: 16px;
 }
 
-/* POPUP DE LEVEL / RANK */
-.system-popup {
+#nivel,
+#rank {
+  font-weight: bold;
+  color: #ffd54a;
+}
+
+/* ===== POPUP LEVEL / RANK ===== */
+.popup {
   position: fixed;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%) scale(0.9);
+
+  min-width: 320px;
+  max-width: 90%;
+  padding: 25px 30px;
+
   background: rgba(10, 20, 40, 0.97);
-  border: 2px solid #ffd54f;
-  color: #ffd54f;
-  padding: 25px 35px;
-  font-size: 22px;
-  text-align: center;
-  box-shadow: 0 0 30px #ffd54f;
+  border: 2px solid #ffd54a;
   border-radius: 14px;
-  display: none;
-  z-index: 9999;
+
+  color: #ffd54a;
+  font-size: 26px;
+  font-weight: bold;
+  text-align: center;
   line-height: 1.4;
+
+  box-shadow:
+    0 0 20px rgba(255, 213, 74, 0.6),
+    0 0 40px rgba(255, 213, 74, 0.35);
+
+  z-index: 9999;
+  animation: popupIn 0.4s ease-out forwards;
 }
 
-/* POPUP MISSÃO BÔNUS */
-.system-popup.bonus {
-  border-color: #4fc3ff;
-  color: #4fc3ff;
-  box-shadow: 0 0 30px #4fc3ff;
-}
-
-/* ANIMAÇÃO DO POPUP */
-@keyframes popup {
-  0% {
+/* ===== ANIMAÇÃO ===== */
+@keyframes popupIn {
+  from {
     opacity: 0;
-    transform: translate(-50%, -60%) scale(0.85);
+    transform: translate(-50%, -60%) scale(0.7);
   }
-  15% {
+  to {
     opacity: 1;
-    transform: translate(-50%, -50%) scale(1.05);
-  }
-  85% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0;
-    transform: translate(-50%, -40%) scale(0.9);
+    transform: translate(-50%, -50%) scale(1);
   }
 }
