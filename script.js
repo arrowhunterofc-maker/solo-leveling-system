@@ -39,7 +39,7 @@ function save() {
 }
 
 // ======================
-// UI UPDATE
+// UI
 // ======================
 function updateUI() {
   document.getElementById("flexao").innerText = data.flexao;
@@ -50,19 +50,19 @@ function updateUI() {
   document.getElementById("nivel").innerText = data.nivel;
   document.getElementById("rank").innerText = RANKS[data.rankIndex];
 
-  checkOK("flexao");
-  checkOK("abdominal");
-  checkOK("agachamento");
-  checkOK("corrida");
+  showCheck("flexao");
+  showCheck("abdominal");
+  showCheck("agachamento");
+  showCheck("corrida");
 }
 
-function checkOK(type) {
-  const ok = document.getElementById(`ok-${type}`);
-  ok.innerText = data[type] >= LIMITS[type] ? "✔" : "";
+function showCheck(type) {
+  document.getElementById(`ok-${type}`).innerText =
+    data[type] >= LIMITS[type] ? "✔" : "";
 }
 
 // ======================
-// MISSÃO
+// MISSÕES
 // ======================
 function add(type) {
   if (data[type] >= LIMITS[type]) return;
@@ -71,20 +71,27 @@ function add(type) {
   save();
   updateUI();
 
-  checkMissionComplete();
+  if (isMissionComplete()) {
+    handleMissionComplete();
+  }
 }
 
-function checkMissionComplete() {
-  const done =
+function isMissionComplete() {
+  return (
     data.flexao >= LIMITS.flexao &&
     data.abdominal >= LIMITS.abdominal &&
     data.agachamento >= LIMITS.agachamento &&
-    data.corrida >= LIMITS.corrida;
+    data.corrida >= LIMITS.corrida
+  );
+}
 
-  if (done) {
-    levelUp(1);
+function handleMissionComplete() {
+  levelUp();
+
+  // espera a animação antes de resetar
+  setTimeout(() => {
     resetMission();
-  }
+  }, 2000);
 }
 
 function resetMission() {
@@ -92,6 +99,7 @@ function resetMission() {
   data.abdominal = 0;
   data.agachamento = 0;
   data.corrida = 0;
+
   save();
   updateUI();
 }
@@ -99,13 +107,11 @@ function resetMission() {
 // ======================
 // LEVEL / RANK
 // ======================
-function levelUp(amount) {
+function levelUp() {
   const oldLevel = data.nivel;
-  data.nivel += amount;
+  data.nivel++;
 
-  showBox(
-    `LEVEL UP!<br>${oldLevel} → ${data.nivel}`
-  );
+  showPopup(`LEVEL UP!<br>${oldLevel} → ${data.nivel}`);
 
   const newRankIndex = Math.min(
     Math.floor((data.nivel - 1) / 10),
@@ -115,9 +121,10 @@ function levelUp(amount) {
   if (newRankIndex > data.rankIndex) {
     const oldRank = RANKS[data.rankIndex];
     data.rankIndex = newRankIndex;
-    showBox(
-      `RANK UP!<br>${oldRank} → ${RANKS[data.rankIndex]}`
-    );
+
+    setTimeout(() => {
+      showPopup(`RANK UP!<br>${oldRank} → ${RANKS[data.rankIndex]}`);
+    }, 600);
   }
 
   save();
@@ -125,15 +132,17 @@ function levelUp(amount) {
 }
 
 // ======================
-// ANIMAÇÃO
+// POPUP
 // ======================
-function showBox(text) {
-  let box = document.createElement("div");
+function showPopup(text) {
+  const box = document.createElement("div");
   box.className = "popup";
   box.innerHTML = text;
   document.body.appendChild(box);
 
-  setTimeout(() => box.remove(), 2500);
+  setTimeout(() => {
+    box.remove();
+  }, 2500);
 }
 
 // ======================
